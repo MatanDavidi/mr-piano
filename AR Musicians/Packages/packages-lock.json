@@ -1,9 +1,26 @@
 {
   "dependencies": {
+    "com.microsoft.mixedreality.openxr": {
+      "version": "file:MixedReality/com.microsoft.mixedreality.openxr-1.11.1.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {
+        "com.unity.xr.arfoundation": "4.1.7",
+        "com.unity.xr.management": "4.2.0",
+        "com.unity.xr.openxr": "1.7.0",
+        "com.unity.xr.core-utils": "2.1.0"
+      }
+    },
     "com.microsoft.mrtk.graphicstools.unity": {
       "version": "file:MixedReality/com.microsoft.mrtk.graphicstools.unity-0.5.12.tgz",
       "depth": 0,
       "source": "local-tarball",
+      "dependencies": {}
+    },
+    "com.unity.2d.sprite": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
       "dependencies": {}
     },
     "com.unity.burst": {
