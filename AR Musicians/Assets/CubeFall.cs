@@ -25,11 +25,11 @@ public class CubeFall : MonoBehaviour
         if (timeSinceSpawn < 0)
             t = 0;
 
-        // center moves from blockHeight/2 above the plane to blockHeight below the plane. This way we wait out the full duration of the note
+        // center moves from blockHeight/2 above the plane to blockHeight/2 below the plane. This way we wait out the full duration of the note
         Vector3 localKeyPos = plane.GetLocalKeyPosition(keyIndex);
         // The blockheight should not be scaled by the plane height, therefore we divide by the plane height to cancel it out 
         Vector3 top = plane.transform.TransformPoint(localKeyPos + Vector3.up * (blockHeight / 2f / plane.height));
-        Vector3 bottom = top - plane.transform.up * plane.height - Vector3.up * (blockHeight / plane.height);
+        Vector3 bottom = top - plane.transform.up * plane.height - plane.transform.up * (blockHeight / 2f / plane.height);
         transform.position = Vector3.Lerp(top, bottom, t);
         // match plane rotation
         transform.rotation = plane.transform.rotation;

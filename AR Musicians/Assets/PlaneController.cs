@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
+using UnityEngine.InputSystem;
 
 [ExecuteAlways]
 public class PlaneController : MonoBehaviour
@@ -22,13 +24,13 @@ public class PlaneController : MonoBehaviour
 
     void Start()
     {
-        Update();
+        leftmostKeyIndex = NoteNameToKeyIndex(leftmostKey);
+        BuildKeyLayout();
     }
     void Update()
     {
         transform.localScale = new Vector3(width, height, 1f);
-        leftmostKeyIndex = NoteNameToKeyIndex(leftmostKey);
-        BuildKeyLayout();
+
     }
 
     // Determine which keys are white or black and space them correctly
@@ -54,15 +56,15 @@ public class PlaneController : MonoBehaviour
             totalUnits += isWhite ? whiteWidthUnit : blackWidthUnit;
         }
 
-        float unitToWorld = width / totalUnits;
+        float unitToLocal = 1f / totalUnits;
 
         // Compute keycenter positions with the corresponding width
-        float currentX = -width / 2f;
+        float currentX = -0.5f;
         for (int i = 0; i < totalKeys; i++)
         {
             bool isWhite = pattern[(leftmostKeyIndex + i) % 12];
             float wUnits = isWhite ? whiteWidthUnit : blackWidthUnit;
-            float worldWidth = wUnits * unitToWorld; // width of the key in world space
+            float worldWidth = wUnits * unitToLocal; // width of the key in local space
 
             float centerX = currentX + worldWidth / 2f;
             localKeyCenters.Add(new Vector3(centerX, 0.5f, 0f)); // spawn at the top of the plane (total height is 1 in local space, since center is (0,0), 0.5 is at the top)
@@ -103,7 +105,7 @@ public class PlaneController : MonoBehaviour
 
         // Piano key index = noteNumber + 12 * octave number
         int keyIndex = noteNumber + 12 * octave;
-
+        keyIndex = Math.Clamp(keyIndex, leftmostKeyIndex, totalKeys - 1);
         return keyIndex;
     }
 }

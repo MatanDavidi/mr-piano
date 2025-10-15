@@ -16,5 +16,5 @@ public class NoteEvent
 [System.Serializable]
 public class NoteEventList
 {
-    public NoteEvent[] events;
+    public NoteEvent[] Items;
 }
