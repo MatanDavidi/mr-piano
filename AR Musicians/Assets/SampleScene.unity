@@ -871,9 +871,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlaneDefiner
   vertexPrefabWidth: 0.01
-  requiredPoints: 4
   pointVisualizerPrefab: {fileID: 3615943980302085371, guid: 1517b001fd59c534d8a2603fee5044b3, type: 3}
-  planeCorrectorPrefab: {fileID: 816771442}
+  planeCornerCorrectorNode: {fileID: 816771442}
+  planeTranslateCorrectorNode: {fileID: 816771442}
   userPlaneColor: {r: 0, g: 1, b: 0, a: 1}
   mathPlaneColor: {r: 0, g: 0, b: 1, a: 1}
   mathPlaneSize: 0.5
@@ -2253,6 +2253,88 @@ Transform:
   - {fileID: 346649881}
   m_Father: {fileID: 345435132}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &416035128
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 416035131}
+  - component: {fileID: 416035130}
+  - component: {fileID: 416035129}
+  - component: {fileID: 416035132}
+  m_Layer: 0
+  m_Name: NetworkManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &416035129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 416035128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f535894c0e5c2194096c459a3a4a2d35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SyncStart
+  perpendicularPlaneFinderObject: {fileID: 374418367}
+--- !u!114 &416035130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 416035128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10e9089032de6784b92e5c4e9b1dacb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Launcher
+  multiplayer: 1
+--- !u!4 &416035131
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 416035128}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.02273, y: 0.02401, z: -0.09288}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &416035132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 416035128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 1
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &421659868
 GameObject:
   m_ObjectHideFlags: 0
@@ -12277,3 +12359,4 @@ SceneRoots:
   - {fileID: 1348985339}
   - {fileID: 452005785}
   - {fileID: 192860818}
+  - {fileID: 416035131}

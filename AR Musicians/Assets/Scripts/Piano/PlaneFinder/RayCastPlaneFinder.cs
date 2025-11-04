@@ -12,6 +12,7 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
     {
         if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger))
         {
+            Debug.Log("Pushed the IndexTrigger");
             var ray = new Ray(
                 rightControllerAnchor.position,
                 rightControllerAnchor.forward

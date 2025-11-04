@@ -25,8 +25,10 @@ public class NoteCubeManager : MonoBehaviour
     private static string[] noteNames =
             { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 
+    private bool started = false;
     void Start()
     {
+        Debug.Log("NoteCubeManager Start called!");
         string path = Application.dataPath + "/Music/song.json";
 
         ConvertMidiToJson(Application.dataPath + "/Music/potc.mid", path);
@@ -45,10 +47,6 @@ public class NoteCubeManager : MonoBehaviour
             Debug.LogError("No such file exists: " + path);
             return;
         }
-        audioSource.clip = Resources.Load<AudioClip>("potc");
-        songStartTime = Time.time + fallTime;
-        StartCoroutine(PlayAudioWithDelay(fallTime));
-
     }
     IEnumerator PlayAudioWithDelay(float delay)
     {
@@ -58,8 +56,18 @@ public class NoteCubeManager : MonoBehaviour
         songStartTime = Time.time;
     }
 
+    public void Play()
+    {
+        audioSource.clip = Resources.Load<AudioClip>("potc");
+        songStartTime = Time.time + fallTime;
+        started = true;
+        StartCoroutine(PlayAudioWithDelay(fallTime));
+    }
+
     void Update()
     {
+        if (!started)
+            return;
         float elapsed = Time.time - songStartTime;
         // Spawn notes
         foreach (var note in notes.ToArray())

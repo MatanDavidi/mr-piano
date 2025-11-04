@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using UnityEngine.InputSystem;
+using Melanchall.DryWetMidi.Interaction;
 
 [ExecuteAlways]
 public class PlaneController : MonoBehaviour
@@ -16,7 +17,6 @@ public class PlaneController : MonoBehaviour
 
     private int leftmostKeyIndex = 0;
     public float whiteToBlackRatio = 1.66f;
-
     private List<Vector3> localKeyCenters = new List<Vector3>(); // Positions in *Local* Space!
     private List<float> keyWidths = new List<float>();
     private static string[] noteNames =
@@ -30,7 +30,6 @@ public class PlaneController : MonoBehaviour
     void Update()
     {
         transform.localScale = new Vector3(width, height, 1f);
-
     }
 
     // Determine which keys are white or black and space them correctly
@@ -74,12 +73,6 @@ public class PlaneController : MonoBehaviour
         }
     }
 
-    // check if the key at keyIndex is a white key
-    public bool IsWhiteKey(int keyIndex)
-    {
-        bool[] pattern = { true, false, true, false, true, true, false, true, false, true, false, true };
-        return pattern[keyIndex % 12];
-    }
 
     public float GetLocalKeyWidth(int keyIndex)
     {

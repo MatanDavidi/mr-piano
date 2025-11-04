@@ -104,8 +104,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09682ca2271cdac4c9b6abe6cb4e1cd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlaneController
-  width: 2
-  height: 1
+  width: 0.6252901
+  height: 0.31264505
   totalKeys: 32
   leftmostKey: F2
   whiteToBlackRatio: 1.66
@@ -171,7 +171,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: a6680973272b9b5408bf683d98c760fc, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

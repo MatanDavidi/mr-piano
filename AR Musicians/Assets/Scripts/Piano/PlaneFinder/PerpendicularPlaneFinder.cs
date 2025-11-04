@@ -10,7 +10,6 @@ public class PerpendicularPlaneFinder : MonoBehaviour
 
     private LineRenderer perpendicularLineRenderer;
     private Plane perpendicularPlane;
-
     void Awake()
     {
         // Get and configure the LineRenderer for the perpendicular plane.
@@ -97,8 +96,8 @@ public class PerpendicularPlaneFinder : MonoBehaviour
             PlaneController pianoHUD = objectToPlaceOnPlane.GetComponent<PlaneController>();
             pianoHUD.width = planeLength;
             pianoHUD.height = planeHeight;
-            GameObject plane = Instantiate(pianoHUD.gameObject, position, rotation);
-            
+            objectToPlaceOnPlane = Instantiate(pianoHUD.gameObject, position, rotation);
+
         }
     }
 }

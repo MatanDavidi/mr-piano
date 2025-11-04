@@ -84,7 +84,7 @@ public class PianoManager : MonoBehaviour
     {
         if (planeDefined && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
         {
-            DefinePlane();    
+            DefinePlane();
         }
     }
 
@@ -109,6 +109,7 @@ public class PianoManager : MonoBehaviour
     /// After 3 poitns have been design, put them on same y-coordinate and infer the 4th point
     private void FinishSetup()
     {
+        Debug.Log("Finishing Setup");
         // plane heuristic: all points lie on same y-value.
         // Corner 3 and 4 are perpendicular to corner 2 and 1 respectively.
         float yValue = (initPlaneAnchors[0] + initPlaneAnchors[1]).y / 2;
@@ -193,9 +194,10 @@ public class PianoManager : MonoBehaviour
         rightNode.vertexIndex = 1;
         rightCornerCorrectorNode = rightCorrectorObj;
 
+        Debug.Log("Added Plane Correctors");
         // TODO: Add a translation anchor to move the whole plane in space, not only single nodes.
     }
-    
+
 
     /// <summary>
     /// Finalizes the plane definition after four points are captured.
