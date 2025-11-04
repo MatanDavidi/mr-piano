@@ -13,9 +13,7 @@ public class SyncStart : MonoBehaviourPun
     {
         PerpendicularPlaneFinder finder = perpendicularPlaneFinderObject.GetComponent<PerpendicularPlaneFinder>();
         PlaneController pianoHUD = finder.objectToPlaceOnPlane.GetComponent<PlaneController>();
-        Debug.Log(pianoHUD);
         Manager = pianoHUD.GetComponentInChildren<NoteCubeManager>();
-        Debug.Log(Manager);
         Debug.Log("Experience started!");
         started = true;
         Manager.Play();
