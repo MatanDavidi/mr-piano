@@ -40,6 +40,8 @@ public class PartialSongData
         MetadataPath = metadataPath;
         HasCorrespondingMetadata = hasCorrespondingMetadata;
     }
+
+    public PartialSongData(PartialSongData source) : this(source.FileName, source.FilePath, source.JsonPath, source.MetadataPath, source.HasCorrespondingMetadata) { }
 }
 
 public class SongsFinder : MonoBehaviour
@@ -119,9 +121,9 @@ public class SongsFinder : MonoBehaviour
 
             foundSongs.AddLast(
                 new PartialSongData(
-                    fullFileName, 
-                    relativePath, 
-                    relativeJsonPath, 
+                    fullFileName,
+                    relativePath,
+                    relativeJsonPath,
                     hasMetadata ? expectedMetadataPath : null,
                     hasMetadata
                 )
@@ -132,7 +134,7 @@ public class SongsFinder : MonoBehaviour
     }
 
     /// <summary>
-    /// Looks through the `StreamingAssets` folder to find all .midi files.
+    /// Looks through the `StreamingAssets` folder to find all .mid files.
     /// Delegates to platform-specific methods.
     /// </summary>
     public IEnumerator FindMidis(System.Action<LinkedList<PartialSongData>> callback)

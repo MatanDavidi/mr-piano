@@ -2,5 +2,6 @@
     "title": "Sandstorm",
     "artists": ["Darude"],
     "releaseYear": 1999,
-    "duration": 225
+    "duration": 225,
+    "difficulty": "Medium"
 }
