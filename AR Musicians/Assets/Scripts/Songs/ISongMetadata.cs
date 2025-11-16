@@ -1,5 +1,10 @@
 
-public class ISongMetadata
+using Assets.Scripts.Songs;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+[System.Serializable]
+public abstract class ISongMetadata
 {
     /// <summary>
     /// Full title of the song
@@ -17,4 +22,8 @@ public class ISongMetadata
     /// Duration in seconds of the track
     /// </summary>
     public uint duration;
+    /// <summary>
+    /// Difficulty of playing the track
+    /// </summary>
+    public SongDifficulty difficulty;
 }
