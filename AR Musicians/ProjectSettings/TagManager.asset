@@ -35,8 +35,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - XR Simulation
+  - HUD
   m_SortingLayers:
   - name: Default
     uniqueID: 0

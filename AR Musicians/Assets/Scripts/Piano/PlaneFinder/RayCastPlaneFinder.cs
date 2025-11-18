@@ -8,9 +8,11 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
     public Transform rightControllerAnchor;
     public EnvironmentRaycastManager raycastManager;
 
+    public bool active = false;
+
     private void Update()
     {
-        if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger))
+        if (active && OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger))
         {
             Debug.Log("Pushed the IndexTrigger");
             var ray = new Ray(
@@ -20,6 +22,7 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
 
             if (raycastManager.Raycast(ray, out var hit))
             {
+                Debug.Log("Hit something");
                 CapturePoint(hit.point);
             }
         }
