@@ -18,6 +18,8 @@ public class SongsUIHandler : MonoBehaviour
     private TMP_Text songDifficultyTMP;
     #endregion
 
+    public NoteCubeManager notecubemanager;
+
     #region Private members
     private LinkedList<SongData> songsData;
     #endregion
@@ -47,6 +49,11 @@ public class SongsUIHandler : MonoBehaviour
     {
         this.songsData = songsData;
         SelectedSong = songsData.First;
+    }
+
+    public void OnSongSelected()
+    {
+        notecubemanager.updateSong(SelectedSong.Value.PartialSongData);
     }
 
     public void OnNextSongSelected()

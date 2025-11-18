@@ -4,7 +4,7 @@ using Photon.Realtime;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
-    public bool multiplayer = true;
+    public bool multiplayer = ProjectConfig.Settings.enableMultiplayer;
     void Start()
     {
         if (multiplayer)

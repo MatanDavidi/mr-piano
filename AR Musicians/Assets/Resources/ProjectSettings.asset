@@ -13,3 +13,8 @@ MonoBehaviour:
   m_Name: ProjectSettings
   m_EditorClassIdentifier: Assembly-CSharp::ProjectSettings
   enableMultiplayer: 1
+  instrument: piano
+  useMultiplayer: 0
+  configured_instruments:
+  - piano
+  master: 1

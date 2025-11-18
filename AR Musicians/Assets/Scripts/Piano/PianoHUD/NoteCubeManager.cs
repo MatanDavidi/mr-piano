@@ -11,6 +11,7 @@ public class NoteCubeManager : MonoBehaviour
 {
 
     public PlaneController plane;
+    public MenuController menucontroller;
     public GameObject noteCubePrefab;
 
     public float fallTime = 2f; // seconds for cube to travel from top to final destination
@@ -23,12 +24,13 @@ public class NoteCubeManager : MonoBehaviour
     public AudioSource audioSource;
 
     private bool started = false;
-    void Start()
+    public void updateSong(PartialSongData songdata)
     {
-        Debug.Log("NoteCubeManager Start called!");
-        string path = Application.dataPath + "/Music/song.json";
+        Debug.Log("NoteCubeManager updateSong called! Processing song: " + songdata.FileName);
 
-        Assets.Scripts.Songs.MidiUtils.ConvertMidiToJson(Application.dataPath + "/Music/potc.mid", path);
+        string path = Application.streamingAssetsPath + "/Music/song.json";
+
+        Assets.Scripts.Songs.MidiUtils.ConvertMidiToJson(Application.streamingAssetsPath + "/Music/" + songdata.FileName, path);
 
         if (File.Exists(path))
         {
@@ -65,6 +67,12 @@ public class NoteCubeManager : MonoBehaviour
     {
         if (!started)
             return;
+        if (notes.Count == 0)
+        {
+            // we finished a song
+            onFinished();
+            return;
+        }
         float elapsed = Time.time - songStartTime;
         // Spawn notes
         foreach (var note in notes.ToArray())
@@ -79,6 +87,12 @@ public class NoteCubeManager : MonoBehaviour
         }
     }
 
+    public void onFinished()
+    {
+        started = false;
+        menucontroller.ShowSongMenu();
+        return;
+    }
     void SpawnCube(NoteEvent note)
     {
         int keyIndex = note.keyIndex;
