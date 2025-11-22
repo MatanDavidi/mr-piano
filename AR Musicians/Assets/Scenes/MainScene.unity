@@ -707,7 +707,7 @@ MonoBehaviour:
 
 
     Once you are
-    satisfied with the defined keyboard surface, press the trigger on your right
+    satisfied with the defined keyboard surface, press the A button on your right
     controller once more to confirm your selection.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -23920,6 +23920,10 @@ MonoBehaviour:
   joinRoomMenu: {fileID: 753679063}
   multiplayerButton: {fileID: 464070183}
   manualPlaneDefinitionMenu: {fileID: 125756380}
+  pianoManager: {fileID: 1215335529}
+  instrumentButtons:
+  - {fileID: 2011489016}
+  - {fileID: 1257960519}
 --- !u!1 &1799893254
 GameObject:
   m_ObjectHideFlags: 0

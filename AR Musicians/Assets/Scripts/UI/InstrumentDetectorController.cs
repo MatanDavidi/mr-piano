@@ -18,6 +18,7 @@ public class InstrumentDetectorController : MonoBehaviour
         }
         else
         {
+            pianoManager.Active = true;
             pianoManager.ResetDefinition();
             rayCastPlaneFinder.active = true;
         }
