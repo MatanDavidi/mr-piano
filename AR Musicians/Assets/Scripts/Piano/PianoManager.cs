@@ -181,6 +181,10 @@ public class PianoManager : MonoBehaviour
         // TODO: Put them in another class to make it more abstract.
         Vector3 leftPos = planeAnchors[0] + 0.1f * (Vector3.up + Vector3.left);
         GameObject leftCorrectorObj = Instantiate(planeCornerCorrectorNode, leftPos, Quaternion.identity);
+        if (leftCorrectorObj.GetComponent<PlaneCorrectionNode>() == null)
+        {
+            leftCorrectorObj.AddComponent<PlaneCorrectionNode>();
+        }
         PlaneCorrectionNode leftNode = leftCorrectorObj.GetComponent<PlaneCorrectionNode>();
         leftNode.manager = this;
         leftNode.vertexIndex = 0;
@@ -189,6 +193,10 @@ public class PianoManager : MonoBehaviour
         // Right Anchor
         Vector3 rightPos = planeAnchors[1] + 0.1f * (Vector3.up + Vector3.right);
         GameObject rightCorrectorObj = Instantiate(planeCornerCorrectorNode, rightPos, Quaternion.identity);
+        if (rightCorrectorObj.GetComponent<PlaneCorrectionNode>() == null)
+        {
+            rightCorrectorObj.AddComponent<PlaneCorrectionNode>();
+        }
         PlaneCorrectionNode rightNode = rightCorrectorObj.GetComponent<PlaneCorrectionNode>();
         rightNode.manager = this;
         rightNode.vertexIndex = 1;

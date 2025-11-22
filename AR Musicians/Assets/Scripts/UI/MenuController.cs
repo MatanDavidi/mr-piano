@@ -15,6 +15,9 @@ public class MenuController : MonoBehaviour
 
     public Button multiplayerButton;
 
+    [SerializeField]
+    private GameObject manualPlaneDefinitionMenu;
+
     public void Start()
     {
         multiplayerButton.interactable = ProjectConfig.Settings.enableMultiplayer;
@@ -32,6 +35,7 @@ public class MenuController : MonoBehaviour
         createRoomMenu.SetActive(false);
         joinRoomMenu.SetActive(false);
         instrumentDetectorMenu.SetActive(false);
+        manualPlaneDefinitionMenu.SetActive(false);
     }
     public void ShowMultiplayerMenu()
     {
@@ -43,6 +47,12 @@ public class MenuController : MonoBehaviour
     {
         HideAllMenus();
         instrumentDetectorMenu.SetActive(true);
+    }
+
+    public void HideInstrumentDetectorMenu()
+    {
+        HideAllMenus();
+        manualPlaneDefinitionMenu.SetActive(true);
     }
 
     public void ShowCreateRoomMenu()

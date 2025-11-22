@@ -44,6 +44,10 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
             else if (Physics.Raycast(ray, out RaycastHit physicsHit, 100f))
             {
                 CapturePoint(physicsHit.point);
+            } else
+            {
+                Vector3 controllerPosition = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
+                CapturePoint(controllerPosition);
             }
         }
     }
