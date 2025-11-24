@@ -12,7 +12,7 @@ using UnityEngine;
 
 internal class ISongJson : ISongMetadata { };
 
-internal class SongData : ISongMetadata
+public class SongData : ISongMetadata
 {
     public PartialSongData PartialSongData { get; private set; }
 

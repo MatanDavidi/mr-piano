@@ -22,15 +22,87 @@ public class NoteCubeManager : MonoBehaviour
     private List<NoteEvent> notes = new List<NoteEvent>();
     private float songStartTime;
     public AudioSource audioSource;
-
     private bool started = false;
-    public void updateSong(PartialSongData songdata)
+
+    private int cubeCount = 0;
+
+    public void Start()
     {
-        Debug.Log("NoteCubeManager updateSong called! Processing song: " + songdata.FileName);
+        PianoManager.OnPlaneDefined += updatePlane;
+        CubeFall.deleteCube += onDeleteCube;
+
+    }
+
+    private void updatePlane(DefinedPlane definedPlane)
+    {
+        // --- 1. Define the Perpendicular Plane ---
+        // The center of our new plane will be the middle point of the top edge.
+        Vector3 distToNewCenter = definedPlane.Plane.normal * ((definedPlane.Corner3 - definedPlane.Corner2) / 2f).magnitude;
+        Vector3 center = definedPlane.Center + distToNewCenter;
+
+        // For this computation, we assume the following:
+        // C4---C3
+        //  |   |
+        // C1---C2
+        // The normal of our new plane will be parallel to one of the edges of the original plane.
+        // This makes it "perpendicular" in the sense that it rises up like a wall from that edge.
+        Vector3 perpNormal = (definedPlane.Corner2 - definedPlane.Corner3).normalized;
+
+        // --- 2. Define a Rectangle to Visualize the Plane ---
+        // A plane is infinite, so we define a rectangle to draw.
+        // The "up" direction for our new rectangle is the normal of the original plane.
+        Vector3 rectUpDir = definedPlane.Plane.normal.normalized;
+
+        // The "right" direction for our rectangle is perpendicular to both its up direction and its normal.
+        // We can find this with the cross product.
+        Vector3 rectRightDir = Vector3.Cross(perpNormal, rectUpDir).normalized;
+
+        // Let's define the size of the rectangle based on the original plane's dimensions.
+        float rectHeight = Vector3.Distance(definedPlane.Corner1, definedPlane.Corner4);
+        float rectWidth = Vector3.Distance(definedPlane.Corner1, definedPlane.Corner2);
+
+        // Calculate the four corners of the visualization rectangle.
+        Vector3[] perpCorners = new Vector3[4];
+        perpCorners[0] = center + rectRightDir * rectWidth / 2f + rectUpDir * rectHeight / 2f;
+        perpCorners[1] = center - rectRightDir * rectWidth / 2f + rectUpDir * rectHeight / 2f;
+        perpCorners[2] = center - rectRightDir * rectWidth / 2f - rectUpDir * rectHeight / 2f;
+        perpCorners[3] = center + rectRightDir * rectWidth / 2f - rectUpDir * rectHeight / 2f;
+
+        // --- 3. Draw the Perpendicular Rectangle ---
+        //perpendicularLineRenderer.enabled = true;
+        //perpendicularLineRenderer.positionCount = 4;
+        //perpendicularLineRenderer.SetPositions(perpCorners);
+        //perpendicularLineRenderer.loop = true;
+
+        // --- 4. Place the Object ---
+
+        float planeLength = (definedPlane.Corner1 - definedPlane.Corner2).magnitude;
+        float planeHeight = planeLength / 2;
+
+        // The object should be placed at the center of the new plane.
+        Vector3 edgeCenterPoint = (definedPlane.Corner2 + definedPlane.Corner1) / 2;
+        Vector3 position = edgeCenterPoint + definedPlane.Plane.normal * planeHeight / 2;
+        // Vector3 position = edgeCenterPoint;
+
+        // The object's "forward" direction should face along the new plane's normal.
+        // Its "up" direction should align with the "up" direction of the rectangle we calculated.
+        Quaternion rotation = Quaternion.LookRotation(perpNormal, rectUpDir);
+
+        // Instantiate the object with the calculated position and rotation.
+        plane.width = planeLength;
+        plane.height = planeHeight;
+        plane.transform.position = position;
+        plane.transform.rotation = rotation;
+        plane.reInit();
+    }
+
+    public void updateSong(SongData songdata)
+    {
+        Debug.Log("NoteCubeManager updateSong called! Processing song: " + songdata.PartialSongData.FileName);
 
         string path = Application.streamingAssetsPath + "/Music/song.json";
 
-        Assets.Scripts.Songs.MidiUtils.ConvertMidiToJson(Application.streamingAssetsPath + "/Music/" + songdata.FileName, path);
+        Assets.Scripts.Songs.MidiUtils.ConvertMidiToJson(Application.streamingAssetsPath + "/Music/" + songdata.PartialSongData.FileName, path);
 
         if (File.Exists(path))
         {
@@ -57,23 +129,31 @@ public class NoteCubeManager : MonoBehaviour
 
     public void Play()
     {
-        audioSource.clip = Resources.Load<AudioClip>("potc");
+        //audioSource.clip = Resources.Load<AudioClip>("potc");
         songStartTime = Time.time + fallTime;
         started = true;
-        StartCoroutine(PlayAudioWithDelay(fallTime));
+        //StartCoroutine(PlayAudioWithDelay(fallTime));
     }
 
     void Update()
     {
         if (!started)
             return;
+
+        float elapsed = Time.time - songStartTime;
         if (notes.Count == 0)
         {
-            // we finished a song
-            onFinished();
-            return;
+            if (cubeCount == 0)
+            {
+                // we finished a song
+                onFinished();
+                return;
+            }
+            else
+            {
+                Debug.Log("Still waiting for " + cubeCount + " blocks to finish falling");
+            }
         }
-        float elapsed = Time.time - songStartTime;
         // Spawn notes
         foreach (var note in notes.ToArray())
         {
@@ -95,6 +175,7 @@ public class NoteCubeManager : MonoBehaviour
     }
     void SpawnCube(NoteEvent note)
     {
+        cubeCount++;
         int keyIndex = note.keyIndex;
 
         // blockHeight == velocity * duration
@@ -127,5 +208,10 @@ public class NoteCubeManager : MonoBehaviour
         fall.origBlockHeight = blockHeight;
         fall.blockDepth = blockDepth;
         fall.duration = note.duration;
+    }
+
+    void onDeleteCube()
+    {
+        cubeCount--;
     }
 }

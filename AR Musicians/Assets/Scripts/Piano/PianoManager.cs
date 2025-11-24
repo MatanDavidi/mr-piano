@@ -88,7 +88,7 @@ public class PianoManager : MonoBehaviour
 
     private void Update()
     {
-        if (planeDefined && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
+        if (Active && planeDefined && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
         {
             DefinePlane();
         }

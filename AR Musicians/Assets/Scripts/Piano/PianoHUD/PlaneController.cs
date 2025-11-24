@@ -27,6 +27,12 @@ public class PlaneController : MonoBehaviour
         leftmostKeyIndex = NoteNameToKeyIndex(leftmostKey);
         BuildKeyLayout();
     }
+
+    public void reInit()
+    {
+        Start();
+    }
+
     void Update()
     {
         transform.localScale = new Vector3(width, height, 1f);

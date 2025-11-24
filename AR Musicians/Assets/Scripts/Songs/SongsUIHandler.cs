@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -21,18 +22,27 @@ public class SongsUIHandler : MonoBehaviour
     public NoteCubeManager notecubemanager;
 
     #region Private members
-    private LinkedList<SongData> songsData;
+    private List<SongData> songsData;
+    private int nSongs;
+    private int localPos = 0;
     #endregion
 
-    #region Properties
-    private LinkedListNode<SongData> selectedSong;
+    #region Events
 
-    internal LinkedListNode<SongData> SelectedSong
+    public static event Action<int> OnNewPosition;
+    public static event Action OnSelectSong;
+    #endregion
+
+
+    #region Properties
+    private SongData selectedSong;
+
+    internal SongData SelectedSong
     {
         get { return selectedSong; }
         set
         {
-            Debug.Log($"Selected new song: {value.Value}. Updating song selection UI");
+            Debug.Log($"Selected new song: {value}. Updating song selection UI");
             selectedSong = value;
             UpdateUI();
         }
@@ -47,28 +57,39 @@ public class SongsUIHandler : MonoBehaviour
     #region Event handlers
     private void OnSongsLoaded(LinkedList<SongData> songsData)
     {
-        this.songsData = songsData;
-        SelectedSong = songsData.First;
+        this.songsData = songsData.ToList();
+        SelectedSong = this.songsData[0];
+        this.nSongs = songsData.Count;
     }
 
     public void OnSongSelected()
     {
-        notecubemanager.updateSong(SelectedSong.Value.PartialSongData);
+        notecubemanager.updateSong(SelectedSong);
+        OnSelectSong?.Invoke();
     }
 
     public void OnNextSongSelected()
     {
-        SelectedSong = (selectedSong.Next ?? songsData.First);
+        localPos = (localPos + 1) % nSongs;
+        SelectedSong = songsData[localPos];
+        OnNewPosition?.Invoke(localPos);
     }
 
     public void OnPreviousSongSelected()
     {
-        SelectedSong = (selectedSong.Previous ?? songsData.Last);
+        localPos = (localPos - 1 + nSongs) % nSongs;
+        SelectedSong = songsData[localPos];
+        OnNewPosition?.Invoke(localPos);
+    }
+
+    public SongData getSongData(int pos)
+    {
+        return songsData[pos];
     }
 
     private void UpdateUI()
     {
-        SongData currentSongData = selectedSong.Value;
+        SongData currentSongData = selectedSong;
         if (currentSongData == null)
         {
             Debug.LogWarning("Expected selected song data. Got null");

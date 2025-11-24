@@ -14,6 +14,7 @@ public class MenuController : MonoBehaviour
     public GameObject multiplayerMenu;
     public GameObject createRoomMenu;
     public GameObject joinRoomMenu;
+    public GameObject multiplayerLobbyMenu;
 
     public Button multiplayerButton;
 
@@ -25,6 +26,11 @@ public class MenuController : MonoBehaviour
 
     [SerializeField]
     private Button[] instrumentButtons;
+    [SerializeField]
+    private Button[] songSelectionButtons;
+
+    [SerializeField]
+    public Button multiplayerStart;
     #endregion
 
     #region Private fields
@@ -50,6 +56,7 @@ public class MenuController : MonoBehaviour
         joinRoomMenu.SetActive(false);
         instrumentDetectorMenu.SetActive(false);
         manualPlaneDefinitionMenu.SetActive(false);
+        multiplayerLobbyMenu.SetActive(false);
     }
     public void ShowMultiplayerMenu()
     {
@@ -66,6 +73,7 @@ public class MenuController : MonoBehaviour
     public void HideInstrumentDetectorMenu()
     {
         HideAllMenus();
+        // TODO: This is wrong. Only do this when automatic is false. I wouldn't do it here.
         manualPlaneDefinitionMenu.SetActive(true);
     }
 
@@ -91,7 +99,10 @@ public class MenuController : MonoBehaviour
     {
         HideAllMenus();
         songMenu.SetActive(true);
-        // TODO: Depending on whether you're the master or not, you have to disable certain things here.
+        foreach (Button button in songSelectionButtons)
+        {
+            button.interactable = ProjectConfig.Settings.master;
+        }
     }
 
     public void ShowMainMenu()
@@ -143,13 +154,19 @@ public class MenuController : MonoBehaviour
         }
     }
 
+    public void ShowMultiplayerLobbyMenu()
+    {
+        HideAllMenus();
+        multiplayerLobbyMenu.SetActive(true);
+    }
+
     // go to the menu after choosing a song
     public void postSongChoiceMenu()
     {
         bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
         if (multiplayer)
         {
-            Debug.LogError("Multiplayer UI not yet implemented");
+            ShowMultiplayerLobbyMenu();
         }
         else
         {

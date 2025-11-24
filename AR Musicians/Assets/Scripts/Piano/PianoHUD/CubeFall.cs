@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class CubeFall : MonoBehaviour
 {
@@ -7,10 +8,13 @@ public class CubeFall : MonoBehaviour
     public float startTime;     // when the note should hit the plane
     public float duration;
     public int keyIndex;
+    public static event Action deleteCube;
 
     public float origBlockHeight, blockDepth;
     private float spawnTime;
     private float keyWidth;
+
+    private bool done = false;
     void Start()
     {
         keyWidth = plane.GetLocalKeyWidth(keyIndex);
@@ -63,7 +67,12 @@ public class CubeFall : MonoBehaviour
 
         if (t >= 1f)
         {
-            Destroy(gameObject);
+            if (!done)
+            {
+                deleteCube?.Invoke();
+                Destroy(gameObject);
+            }
+            done = true;
         }
 
     }
