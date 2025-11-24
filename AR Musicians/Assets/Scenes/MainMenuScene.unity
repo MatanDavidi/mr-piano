@@ -838,9 +838,9 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontSize: 72
-  m_fontSizeBase: 48
+  m_fontSizeBase: 72
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -1839,7 +1839,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 263729924}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 601591330}
+        m_TargetAssemblyTypeName: SongsUIHandler, Assembly-CSharp
+        m_MethodName: OnPreviousSongSelected
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &263729924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4521,6 +4533,7 @@ MonoBehaviour:
   songReleaseYearTMP: {fileID: 1520595010}
   songDurationTMP: {fileID: 461841884}
   songDifficultyTMP: {fileID: 1210039659}
+  notecubemanager: {fileID: 0}
 --- !u!1 &605962098
 GameObject:
   m_ObjectHideFlags: 0
@@ -13617,7 +13630,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1933002063}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 601591330}
+        m_TargetAssemblyTypeName: SongsUIHandler, Assembly-CSharp
+        m_MethodName: OnNextSongSelected
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1933002063
 MonoBehaviour:
   m_ObjectHideFlags: 0

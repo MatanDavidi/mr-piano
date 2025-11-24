@@ -1,3 +1,4 @@
+using Assets.Scripts.Songs;
 using Melanchall.DryWetMidi.MusicTheory;
 using Meta.Voice.Net.WebSockets;
 using Newtonsoft.Json;
@@ -15,11 +16,12 @@ internal class SongData : ISongMetadata
 {
     public PartialSongData PartialSongData { get; private set; }
 
-    public SongData(string title, string[] artists, short releaseYear, uint duration, PartialSongData partialSongData)
+    public SongData(string title, string[] artists, short releaseYear, uint duration, SongDifficulty difficulty, PartialSongData partialSongData)
     {
         this.title = title;
         this.releaseYear = releaseYear;
         this.duration = duration;
+        this.difficulty = difficulty;
         PartialSongData = new PartialSongData(partialSongData);
 
         // Copy array over to prevent side effects in client
@@ -27,11 +29,11 @@ internal class SongData : ISongMetadata
         Array.Copy(artists, this.artists, artists.Length);
     }
 
-    public SongData(ISongMetadata metadata, PartialSongData partialSongData) : this(metadata.title, metadata.artists, metadata.releaseYear, metadata.duration, partialSongData) { }
+    public SongData(ISongMetadata metadata, PartialSongData partialSongData) : this(metadata.title, metadata.artists, metadata.releaseYear, metadata.duration, metadata.difficulty, partialSongData) { }
 
     public override string ToString()
     {
-        return $"{string.Join(", ", this.artists)} - {this.title} [{this.releaseYear}] ({this.duration}s)";
+        return $"{string.Join(", ", this.artists)} - {this.title} [{this.releaseYear}] ({this.duration}s, {this.difficulty})";
     }
 }
 
@@ -81,6 +83,7 @@ public class SongLoader : MonoBehaviour
                     new string[] { "n/a" },
                     -1,
                     0,
+                    SongDifficulty.Professional,
                     song
                 );
             }

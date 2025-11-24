@@ -1,4 +1,5 @@
 using Meta.XR;
+using Meta.XR.MRUtilityKit; // Make sure MRUtilityKit is included
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -9,6 +10,21 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
     public EnvironmentRaycastManager raycastManager;
 
     public bool active = false;
+    public bool useEnvironmentRaycast = false;
+
+    private void Awake()
+    {
+        // New in v81+: Check if the Environment Raycast feature is supported at all.
+        if (!EnvironmentRaycastManager.IsSupported)
+        {
+            Debug.LogError("EnvironmentRaycastManager is not supported on this device or in the current configuration. Disabling EnvironmentRaycastManager.");
+            useEnvironmentRaycast = false; // Disable functionality
+        }
+        else
+        {
+            Debug.Log("EnvironmentRaycastManager is supported and enabled. Using Depth API");
+        }
+    }
 
     private void Update()
     {
@@ -20,10 +36,18 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
                 rightControllerAnchor.forward
             );
 
-            if (raycastManager.Raycast(ray, out var hit))
+            if (useEnvironmentRaycast && raycastManager != null && raycastManager.Raycast(ray, out var hit))
             {
                 Debug.Log("Hit something");
                 CapturePoint(hit.point);
+            }
+            else if (Physics.Raycast(ray, out RaycastHit physicsHit, 100f))
+            {
+                CapturePoint(physicsHit.point);
+            } else
+            {
+                Vector3 controllerPosition = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
+                CapturePoint(controllerPosition);
             }
         }
     }

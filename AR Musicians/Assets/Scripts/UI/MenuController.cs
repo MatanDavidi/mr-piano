@@ -1,7 +1,9 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 public class MenuController : MonoBehaviour
 {
+    #region Serialized fields
     public GameObject mainMenu;
     public GameObject songMenu;
     public GameObject instrumentSelectorMenu;
@@ -15,9 +17,24 @@ public class MenuController : MonoBehaviour
 
     public Button multiplayerButton;
 
+    [SerializeField]
+    private GameObject manualPlaneDefinitionMenu;
+
+    [SerializeField]
+    private PianoManager pianoManager;
+
+    [SerializeField]
+    private Button[] instrumentButtons;
+    #endregion
+
+    #region Private fields
+    private DefinedPlane definedPlane;
+    #endregion
+
     public void Start()
     {
         multiplayerButton.interactable = ProjectConfig.Settings.enableMultiplayer;
+        PianoManager.OnPlaneDefined += HandlePlaneDefined;
     }
 
     #region Event handlers
@@ -32,6 +49,7 @@ public class MenuController : MonoBehaviour
         createRoomMenu.SetActive(false);
         joinRoomMenu.SetActive(false);
         instrumentDetectorMenu.SetActive(false);
+        manualPlaneDefinitionMenu.SetActive(false);
     }
     public void ShowMultiplayerMenu()
     {
@@ -43,6 +61,12 @@ public class MenuController : MonoBehaviour
     {
         HideAllMenus();
         instrumentDetectorMenu.SetActive(true);
+    }
+
+    public void HideInstrumentDetectorMenu()
+    {
+        HideAllMenus();
+        manualPlaneDefinitionMenu.SetActive(true);
     }
 
     public void ShowCreateRoomMenu()
@@ -131,6 +155,27 @@ public class MenuController : MonoBehaviour
         {
             ShowSinglePlayerLobbyMenu();
         }
+    }
+
+    private void HandlePlaneDefined(DefinedPlane plane)
+    {
+        definedPlane = plane;
+        if (pianoManager != null)
+        {
+            pianoManager.ResetDefinition();
+            pianoManager.Active = false;
+        }
+        if (instrumentButtons != null)
+        {
+            foreach (Button instrumentButton in instrumentButtons)
+            {
+                if (instrumentButton != null)
+                {
+                    instrumentButton.interactable = true;
+                }
+            }
+        }
+        ShowMainMenu();
     }
     #endregion
 }

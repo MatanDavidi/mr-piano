@@ -32,6 +32,7 @@ public class SongsUIHandler : MonoBehaviour
         get { return selectedSong; }
         set
         {
+            Debug.Log($"Selected new song: {value.Value}. Updating song selection UI");
             selectedSong = value;
             UpdateUI();
         }
@@ -78,8 +79,13 @@ public class SongsUIHandler : MonoBehaviour
         songArtistTMP.text = string.Join(", ", currentSongData.artists);
         songReleaseYearTMP.text = Convert.ToString(currentSongData.releaseYear);
         songDurationTMP.text = Convert.ToString(currentSongData.duration);
-        songDifficultyTMP.text = nameof(currentSongData.difficulty);
-        songTitleTMP.ForceMeshUpdate();
+        songDifficultyTMP.text = currentSongData.difficulty.ToString();
+
+        //songTitleTMP.ForceMeshUpdate();
+        //songArtistTMP.ForceMeshUpdate();
+        //songReleaseYearTMP.ForceMeshUpdate();
+        //songDurationTMP.ForceMeshUpdate();
+        //songDifficultyTMP.ForceMeshUpdate();
     }
     #endregion
 }
