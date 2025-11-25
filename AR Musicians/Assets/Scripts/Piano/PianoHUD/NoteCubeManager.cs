@@ -6,6 +6,8 @@ using System;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Newtonsoft.Json;
+using UnityEngine.Networking;
+
 
 public class NoteCubeManager : MonoBehaviour
 {
@@ -98,11 +100,10 @@ public class NoteCubeManager : MonoBehaviour
 
     public void updateSong(SongData songdata)
     {
-        Debug.Log("NoteCubeManager updateSong called! Processing song: " + songdata.PartialSongData.FileName);
+        Debug.Log("NoteCubeManager updateSong called! Processing song: " + songdata.PartialSongData.JsonPath);
 
-        string path = Application.streamingAssetsPath + "/Music/song.json";
+        string path = Path.Combine(Application.streamingAssetsPath, songdata.PartialSongData.JsonPath);
 
-        Assets.Scripts.Songs.MidiUtils.ConvertMidiToJson(Application.streamingAssetsPath + "/Music/" + songdata.PartialSongData.FileName, path);
 
         if (File.Exists(path))
         {
@@ -119,6 +120,70 @@ public class NoteCubeManager : MonoBehaviour
             return;
         }
     }
+
+    /// <summary>
+    /// Loads the JSON content for the specific song.
+    /// MUST be started as a Coroutine: StartCoroutine(updateSongRoutine(songData));
+    /// </summary>
+    public IEnumerator updateSongRoutine(SongData songdata)
+    {
+        Debug.Log("NoteCubeManager updateSong called! Processing song: " + songdata.PartialSongData.JsonPath);
+
+        string relativePath = songdata.PartialSongData.JsonPath;
+        string fullPath = Path.Combine(Application.streamingAssetsPath, relativePath);
+
+        string jsonContent = null;
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+    // Android: We MUST use UnityWebRequest
+    using (UnityWebRequest www = UnityWebRequest.Get(fullPath))
+    {
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            jsonContent = www.downloadHandler.text;
+        }
+        else
+        {
+            Debug.LogError("Failed to load song JSON on Android: " + fullPath + " Error: " + www.error);
+            yield break; // Stop execution
+        }
+    }
+#else
+        // Windows/Editor: We can use File.Exists/ReadAllText
+        if (File.Exists(fullPath))
+        {
+            jsonContent = File.ReadAllText(fullPath);
+        }
+        else
+        {
+            Debug.LogError("No such file exists: " + fullPath);
+            yield break;
+        }
+        // Yield once to keep coroutine behavior consistent across platforms
+        yield return null;
+#endif
+
+        if (!string.IsNullOrEmpty(jsonContent))
+        {
+            try
+            {
+                notes = JsonConvert.DeserializeObject<List<NoteEvent>>(jsonContent);
+                foreach (var n in notes)
+                {
+                    // Ensure 'plane' is accessible here
+                    n.keyIndex = plane.NoteNameToKeyIndex(n.key);
+                }
+                Debug.Log($"Successfully loaded {notes.Count} notes.");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"Error parsing JSON for {relativePath}: {ex.Message}");
+            }
+        }
+    }
+
     IEnumerator PlayAudioWithDelay(float delay)
     {
         yield return new WaitForSeconds(delay);

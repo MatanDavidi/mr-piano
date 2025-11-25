@@ -64,7 +64,8 @@ public class SongsUIHandler : MonoBehaviour
 
     public void OnSongSelected()
     {
-        notecubemanager.updateSong(SelectedSong);
+        //notecubemanager.updateSong(SelectedSong);
+        StartCoroutine(notecubemanager.updateSongRoutine(SelectedSong));
         OnSelectSong?.Invoke();
     }
 

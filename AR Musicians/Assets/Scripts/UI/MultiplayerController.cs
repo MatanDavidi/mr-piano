@@ -134,7 +134,8 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
     // Master selected the song, we need to do the same
     private void OnSelectSongNetwork()
     {
-        noteCubeManager.updateSong(songsUIHandler.SelectedSong);
+        //noteCubeManager.updateSong(songsUIHandler.SelectedSong);
+        StartCoroutine(noteCubeManager.updateSongRoutine(songsUIHandler.SelectedSong));
         menuController.postSongChoiceMenu();
     }
     [PunRPC]
@@ -293,8 +294,8 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
     public void OnSelectTextJoinRoom()
     {
         Debug.Log("OnSelect");
-        if (!simulator) // Not in simulator
-            overlayKeyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
+        //if (!simulator) // Not in simulator
+        //    overlayKeyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
         joinRoomTyping = true;
         createRoomTyping = false;
     }
@@ -311,6 +312,7 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
         joinRoomTyping = false;
         if (simulator) // In simulator
             joinRoomText.text = "Room1";
+        joinRoomText.text = "Room1";
         Debug.Log("Entered Text For Join Room with: " + joinRoomText.text);
 
     }

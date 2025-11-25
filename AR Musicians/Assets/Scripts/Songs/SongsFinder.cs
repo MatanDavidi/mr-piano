@@ -9,8 +9,6 @@ using UnityEngine.Networking;
 
 public class PartialSongData
 {
-    public string FileName { get; private set; }
-    public string FilePath { get; private set; }
     /// <summary>
     /// The path to this MIDI song's corresponding `.json` file, that contains
     /// the data of its notes, required to display them to the user.
@@ -32,16 +30,14 @@ public class PartialSongData
     /// </summary>
     public bool HasCorrespondingMetadata { get; private set; }
 
-    public PartialSongData(string fileName, string filePath, string jsonPath, string metadataPath, bool hasCorrespondingMetadata)
+    public PartialSongData(string jsonPath, string metadataPath, bool hasCorrespondingMetadata)
     {
-        FileName = fileName;
-        FilePath = filePath;
         JsonPath = jsonPath;
         MetadataPath = metadataPath;
         HasCorrespondingMetadata = hasCorrespondingMetadata;
     }
 
-    public PartialSongData(PartialSongData source) : this(source.FileName, source.FilePath, source.JsonPath, source.MetadataPath, source.HasCorrespondingMetadata) { }
+    public PartialSongData(PartialSongData source) : this(source.JsonPath, source.MetadataPath, source.HasCorrespondingMetadata) { }
 }
 
 public class SongsFinder : MonoBehaviour
@@ -62,32 +58,41 @@ public class SongsFinder : MonoBehaviour
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Failed to load file manifest: " + www.error);
-                yield break; // Exit, leaving the song list empty. The callback will be handled by the parent.
+                yield break;
             }
 
             string json = www.downloadHandler.text;
             FileList manifest = JsonUtility.FromJson<FileList>(json);
+
+            // Create a fast lookup set for all files in the build
             var allPaths = new HashSet<string>(manifest.paths);
-            var midiFiles = allPaths.Where(p => p.EndsWith(".mid") || p.EndsWith(".midi"));
 
-            foreach (string midiFilePath in midiFiles)
+            // Filter specifically for your song JSONs
+            foreach (string filePath in allPaths)
             {
-                string fullFileName = Path.GetFileName(midiFilePath);
+                if (!filePath.EndsWith(".json")) continue;
+                if (filePath.Contains("file_manifest") || filePath.Contains(METADATA_SUFFIX)) continue;
 
-                string relativeMidiPath = midiFilePath.Substring(streamingAssetsPath.Length + 1).Replace('\\', '/');
-                string relativeJsonPath = Path.ChangeExtension(relativeMidiPath, ".json");
+                // We assume the manifest paths are relative to StreamingAssets (e.g. "Music/Song.json")
+                string relativeJsonPath = filePath;
 
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(midiFilePath);
-                string directoryName = Path.GetDirectoryName(relativeMidiPath);
-                string relativeMetadataPath = Path.Combine(directoryName, fileNameWithoutExt + METADATA_SUFFIX + ".json").Replace('\\', '/');
+                string directory = Path.GetDirectoryName(relativeJsonPath);
+                string fileNameNoExt = Path.GetFileNameWithoutExtension(relativeJsonPath);
 
-                // Check for metadata using the full path, as File.Exists needs it.
-                string fullMetadataPath = Path.Combine(Application.streamingAssetsPath, relativeMetadataPath);
-                bool hasMetadata = File.Exists(fullMetadataPath);
+                string relativeMetadataPath = "";
+                if (string.IsNullOrEmpty(directory))
+                {
+                    relativeMetadataPath = fileNameNoExt + METADATA_SUFFIX + ".json";
+                }
+                else
+                {
+                    relativeMetadataPath = Path.Combine(directory, fileNameNoExt + METADATA_SUFFIX + ".json").Replace("\\", "/");
+                }
+
+                // Check if metadata exists in our MANIFEST list (not on disk)
+                bool hasMetadata = allPaths.Contains(relativeMetadataPath);
 
                 foundSongs.AddLast(new PartialSongData(
-                    fullFileName,
-                    relativeMidiPath,
                     relativeJsonPath,
                     hasMetadata ? relativeMetadataPath : null,
                     hasMetadata
@@ -97,23 +102,23 @@ public class SongsFinder : MonoBehaviour
     }
 
     /// <summary>
-    /// Finds MIDI files and their corresponding JSON data on Windows/Editor using direct file access.
+    /// Finds Json files on Windows/Editor using direct file access.
     /// </summary>
-    private IEnumerator FindMidisWindows(string streamingAssetsPath, LinkedList<PartialSongData> foundSongs)
+    private IEnumerator FindJsonsWindows(string streamingAssetsPath, LinkedList<PartialSongData> foundSongs)
     {
         // If you're wondering why the `.Where` clause is necessary, see https://learn.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-9.0 and its remarks
         // Basically, calling `Directory.GetFiles` with searchPattern `*.abc` returns both `*.abc` files, as well as `*.abc*` files.
-        string[] midiFiles = Directory.GetFiles(streamingAssetsPath, "*.mid", SearchOption.AllDirectories).Where(file => file.EndsWith(".mid") || file.EndsWith(".midi")).ToArray();
-
-        foreach (string midiFilePath in midiFiles)
+        string[] jsonFiles = Directory.GetFiles(streamingAssetsPath, "*.json", SearchOption.AllDirectories).Where(file => file.EndsWith(".json") || file.EndsWith(".midi")).ToArray();
+        foreach (string jsonFilePath in jsonFiles)
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(midiFilePath);
-            string fullFileName = Path.GetFileName(midiFilePath);
-            string relativePath = midiFilePath.Substring(streamingAssetsPath.Length + 1).Replace('\\', '/');
+            if (jsonFilePath.Contains("metadata") || jsonFilePath.Contains("file_manifest"))
+                continue;
 
-            string relativeJsonPath = Path.ChangeExtension(midiFilePath, ".json");
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(jsonFilePath);
+            string relativePath = jsonFilePath.Substring(streamingAssetsPath.Length + 1).Replace('\\', '/');
+
             string expectedMetadataPath = Path.Combine(
-                Path.GetDirectoryName(midiFilePath),
+                Path.GetDirectoryName(jsonFilePath),
                 fileNameWithoutExt + METADATA_SUFFIX + ".json"
             );
 
@@ -121,9 +126,7 @@ public class SongsFinder : MonoBehaviour
 
             foundSongs.AddLast(
                 new PartialSongData(
-                    fullFileName,
                     relativePath,
-                    relativeJsonPath,
                     hasMetadata ? expectedMetadataPath : null,
                     hasMetadata
                 )
@@ -133,11 +136,42 @@ public class SongsFinder : MonoBehaviour
         yield return null; // Yield once to maintain coroutine structure.
     }
 
+    public IEnumerator LoadJsonFile(string relativePath, Action<string> callback)
+    {
+        string fullPath = Path.Combine(Application.streamingAssetsPath, relativePath);
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+    using (UnityWebRequest www = UnityWebRequest.Get(fullPath))
+    {
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Failed to read json: " + fullPath);
+            callback(null);
+            yield break;
+        }
+
+        callback(www.downloadHandler.text);
+    }
+#else
+        if (!File.Exists(fullPath))
+        {
+            Debug.LogError("File does not exist: " + fullPath);
+            callback(null);
+            yield break;
+        }
+
+        callback(File.ReadAllText(fullPath));
+        yield return null;
+#endif
+    }
+
     /// <summary>
-    /// Looks through the `StreamingAssets` folder to find all .mid files.
+    /// Looks through the `StreamingAssets` folder to find all .json files.
     /// Delegates to platform-specific methods.
     /// </summary>
-    public IEnumerator FindMidis(System.Action<LinkedList<PartialSongData>> callback)
+    public IEnumerator FindJsons(System.Action<LinkedList<PartialSongData>> callback)
     {
         var foundSongs = new LinkedList<PartialSongData>();
         string streamingAssetsPath = Application.streamingAssetsPath;
@@ -145,7 +179,7 @@ public class SongsFinder : MonoBehaviour
 #if UNITY_ANDROID && !UNITY_EDITOR
         yield return FindMidisAndroid(streamingAssetsPath, foundSongs);
 #else
-        yield return FindMidisWindows(streamingAssetsPath, foundSongs);
+        yield return FindJsonsWindows(streamingAssetsPath, foundSongs);
 #endif
 
         // The callback is called exactly once, after the appropriate helper method has finished.
