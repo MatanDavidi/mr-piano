@@ -10,7 +10,7 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
     public EnvironmentRaycastManager raycastManager;
 
     public bool active = false;
-    public bool useEnvironmentRaycast = false;
+    public bool useEnvironmentRaycast = true;
 
     private void Awake()
     {
@@ -23,6 +23,7 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
         else
         {
             Debug.Log("EnvironmentRaycastManager is supported and enabled. Using Depth API");
+            useEnvironmentRaycast = true;
         }
     }
 
@@ -35,6 +36,10 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
                 rightControllerAnchor.position,
                 rightControllerAnchor.forward
             );
+
+
+            Debug.Log("Ray Cast Manager: ", raycastManager);
+            Debug.Log("Use Environment Raycast" + useEnvironmentRaycast.ToString());
 
             if (useEnvironmentRaycast && raycastManager != null && raycastManager.Raycast(ray, out var hit))
             {
