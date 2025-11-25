@@ -15,7 +15,7 @@ public class NoteCubeManager : MonoBehaviour
     public GameObject noteCubePrefab;
 
     public float fallTime = 2f; // seconds for cube to travel from top to final destination
-    public float blockDepth = 0.5f;
+    public float blockDepth = 0.001f;
 
     public float gameSpeed = 1f;
 

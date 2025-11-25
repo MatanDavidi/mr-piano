@@ -104,8 +104,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09682ca2271cdac4c9b6abe6cb4e1cd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlaneController
-  width: 0.6252901
-  height: 0.31264505
+  width: 2
+  height: 1
   totalKeys: 32
   leftmostKey: F2
   whiteToBlackRatio: 1.66
@@ -155,6 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoteCubeManager
   plane: {fileID: 7477862457387984688}
+  menucontroller: {fileID: 0}
   noteCubePrefab: {fileID: 1319196051180581704, guid: 295a9fdb20675cc498a44805908800df, type: 3}
   fallTime: 2
   blockDepth: 0.01

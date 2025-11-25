@@ -179,7 +179,7 @@ public class MenuController : MonoBehaviour
         definedPlane = plane;
         if (pianoManager != null)
         {
-            pianoManager.ResetDefinition();
+            //pianoManager.ResetDefinition();
             pianoManager.Active = false;
         }
         if (instrumentButtons != null)
