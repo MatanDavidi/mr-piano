@@ -21,14 +21,14 @@ public class PianoManager : MonoBehaviour
     [SerializeField] private Color userPlaneColor = Color.green;
     [SerializeField] private Color mathPlaneColor = new Color(0.0f, 0.5f, 1.0f, 0.5f); // Blue with transparency
     [SerializeField] private float mathPlaneSize = 0.5f;
+
+    [Header("Plane Detectors")]
+    [SerializeField] private RayCastPlaneFinder rayCastPlaneFinder;
+    [SerializeField] private CVPlaneFinder cvPlaneFinder;
     #endregion
 
     #region Events
     public static event Action<DefinedPlane> OnPlaneDefined;
-    #endregion
-
-    #region Public members
-    public bool Active { get; set; }
     #endregion
 
     #region Private members
@@ -45,6 +45,7 @@ public class PianoManager : MonoBehaviour
     private int currentVertexIndex = -1;
     private bool planeDefined = false;
     private float sideLength = 0.0f;
+    private bool Active { get; set; }
 
     private Vector3[] initPlaneAnchors; // The initial set plane anchors
     private Vector3[] planeAnchors; // The corrected plane anchors
@@ -54,6 +55,27 @@ public class PianoManager : MonoBehaviour
     private GameObject mathPlaneVisualizer;
     private LinkedList<GameObject> setupGameObjects;
     #endregion
+
+    public void Activate(bool automatic)
+    {
+        Active = true;
+        ResetDefinition();
+        if (automatic)
+        {
+            cvPlaneFinder.Activate();
+        }
+        else
+        {
+            rayCastPlaneFinder.Activate();
+        }
+    }
+
+    public void Deactivate()
+    {
+        cvPlaneFinder.Deactivate();
+        rayCastPlaneFinder.Deactivate();
+        Active = false;
+    }
 
     void Awake()
     {

@@ -9,7 +9,6 @@ public class RayCastPlaneFinder : AbstractPlaneFinder
     public Transform rightControllerAnchor;
     public EnvironmentRaycastManager raycastManager;
 
-    public bool active = false;
     public bool useEnvironmentRaycast = true;
 
     private void Awake()

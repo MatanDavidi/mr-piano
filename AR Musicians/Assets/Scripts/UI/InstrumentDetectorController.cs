@@ -3,7 +3,6 @@ using UnityEngine;
 public class InstrumentDetectorController : MonoBehaviour
 {
     bool automatic = true;
-    public RayCastPlaneFinder rayCastPlaneFinder;
     public PianoManager pianoManager;
     public void OnToggle(bool automatic)
     {
@@ -12,16 +11,7 @@ public class InstrumentDetectorController : MonoBehaviour
 
     public void OnPianoPress()
     {
-        if (automatic)
-        {
-            Debug.LogError("Need to add automatic Piano detection here");
-        }
-        else
-        {
-            pianoManager.Active = true;
-            pianoManager.ResetDefinition();
-            rayCastPlaneFinder.active = true;
-        }
+        pianoManager.Activate(automatic);
     }
 
     public void OnBongosPress()
