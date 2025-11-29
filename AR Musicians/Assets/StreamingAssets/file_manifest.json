@@ -1,0 +1,9 @@
+{
+    "paths": [
+        "file_manifest.json",
+        "Music/darude-sandstorm.json",
+        "Music/darude-sandstorm_metadata.json",
+        "Music/potc.json",
+        "Music/potc_metadata.json"
+    ]
+}

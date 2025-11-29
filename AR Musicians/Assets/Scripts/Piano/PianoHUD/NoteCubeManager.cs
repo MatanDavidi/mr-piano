@@ -24,15 +24,24 @@ public class NoteCubeManager : MonoBehaviour
     private List<NoteEvent> notes = new List<NoteEvent>();
     private float songStartTime;
     public AudioSource audioSource;
-    private bool started = false;
+    public bool playing = false;
+    private float totalPauseTime = 0; // seconds we spent paused
+
+    private float pauseBegin = 0;
 
     private int cubeCount = 0;
+
+    public bool quit = false;
+
+    public static event Action<float> OnResume;
+    public static event Action OnPause;
+    public static event Action OnQuit;
+
 
     public void Start()
     {
         PianoManager.OnPlaneDefined += updatePlane;
         CubeFall.deleteCube += onDeleteCube;
-
     }
 
     private void updatePlane(DefinedPlane definedPlane)
@@ -196,16 +205,43 @@ public class NoteCubeManager : MonoBehaviour
     {
         //audioSource.clip = Resources.Load<AudioClip>("potc");
         songStartTime = Time.time + fallTime;
-        started = true;
+        playing = true;
+        ProjectConfig.Settings.playing = true;
+        totalPauseTime = 0;
+        quit = false;
         //StartCoroutine(PlayAudioWithDelay(fallTime));
+    }
+
+    public void Pause()
+    {
+        ProjectConfig.Settings.playing = false;
+        playing = false;
+        pauseBegin = Time.time;
+        OnPause?.Invoke();
+    }
+
+    public void Resume()
+    {
+        ProjectConfig.Settings.playing = true;
+        playing = true;
+        float curPauseTime = Time.time - pauseBegin;
+        totalPauseTime += curPauseTime;
+        OnResume?.Invoke(curPauseTime);
+    }
+
+    public void Quit()
+    {
+        quit = true;
+        OnQuit?.Invoke();
+        onFinished();
     }
 
     void Update()
     {
-        if (!started)
+        if (!playing)
             return;
 
-        float elapsed = Time.time - songStartTime;
+        float elapsed = Time.time - songStartTime - totalPauseTime;
         if (notes.Count == 0)
         {
             if (cubeCount == 0)
@@ -234,7 +270,9 @@ public class NoteCubeManager : MonoBehaviour
 
     public void onFinished()
     {
-        started = false;
+        playing = false;
+        ProjectConfig.Settings.playing = false;
+        totalPauseTime = 0;
         menucontroller.ShowSongMenu();
         return;
     }
@@ -273,6 +311,10 @@ public class NoteCubeManager : MonoBehaviour
         fall.origBlockHeight = blockHeight;
         fall.blockDepth = blockDepth;
         fall.duration = note.duration;
+        fall.pauseTime = 0;
+        OnPause += fall.OnPause;
+        OnResume += fall.OnResume;
+        OnQuit += fall.OnQuit;
     }
 
     void onDeleteCube()

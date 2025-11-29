@@ -35,6 +35,7 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
     private int localQueuePos = 0;
 
     private Dictionary<Player, bool> playersReady;
+    private bool masterPauser = false;
     void Start()
     {
         simulator = !EnvironmentRaycastManager.IsSupported;
@@ -59,7 +60,52 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
             }
         }
         multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+        if (!masterPauser && multiplayer && noteCubeManager.playing && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
+        {
+            OnPauseLocal();
+        }
     }
+    #region Pause
+    public void OnQuitLocal()
+    {
+        if (master)
+        {
+            photonView.RPC("OnQuitNetwork", RpcTarget.Others);
+        }
+    }
+    [PunRPC]
+    private void OnQuitNetwork()
+    {
+        noteCubeManager.Quit();
+    }
+    // Locally pressed pause button
+    private void OnPauseLocal()
+    {
+        masterPauser = true;
+        photonView.RPC("OnPauseNetwork", RpcTarget.All);
+    }
+    [PunRPC]
+    // Someone in the lobby pressed the pause button
+    private void OnPauseNetwork()
+    {
+        noteCubeManager.Pause();
+        menuController.ShowMultiplayerPauseMenu(masterPauser || master);
+        masterPauser = false;
+    }
+    public void OnResumeLocal()
+    {
+        photonView.RPC("OnResumeNetwork", RpcTarget.All);
+    }
+    [PunRPC]
+    private void OnResumeNetwork()
+    {
+        if (noteCubeManager.quit)
+            return;
+        menuController.HideAllMenus();
+        countDownUI.ResumeCountdown();
+    }
+    #endregion
+
     #region Ready
     public void OnToggleLocal()
     {

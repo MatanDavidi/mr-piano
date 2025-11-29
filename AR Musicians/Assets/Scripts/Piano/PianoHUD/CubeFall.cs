@@ -8,22 +8,49 @@ public class CubeFall : MonoBehaviour
     public float startTime;     // when the note should hit the plane
     public float duration;
     public int keyIndex;
+    public float pauseTime = 0;
     public static event Action deleteCube;
 
     public float origBlockHeight, blockDepth;
     private float spawnTime;
     private float keyWidth;
-
     private bool done = false;
+    private bool paused = false;
     void Start()
     {
         keyWidth = plane.GetLocalKeyWidth(keyIndex);
         spawnTime = Time.time;
     }
 
+    public void OnPause()
+    {
+        paused = true;
+    }
+
+    public void OnResume(float newPauseTime)
+    {
+        pauseTime += newPauseTime;
+        paused = false;
+    }
+
+    private void unsubscribe()
+    {
+        NoteCubeManager.OnPause -= OnPause;
+        NoteCubeManager.OnQuit -= OnQuit;
+        NoteCubeManager.OnResume -= OnResume;
+    }
+    public void OnQuit()
+    {
+        unsubscribe();
+        deleteCube?.Invoke();
+        Destroy(gameObject);
+    }
+
     void Update()
     {
-        float timeSinceSpawn = Time.time - spawnTime;
+        if (paused)
+            return;
+        float timeSinceSpawn = Time.time - spawnTime - pauseTime;
         if (timeSinceSpawn >= fallTime)
         {
             Stretch();  // we already reached the bottom, we have to handle this differently now
@@ -47,7 +74,7 @@ public class CubeFall : MonoBehaviour
 
     void Stretch()
     {
-        float timeSinceSpawn = Time.time - spawnTime;
+        float timeSinceSpawn = Time.time - spawnTime - pauseTime;
         float timeSinceBottom = timeSinceSpawn - fallTime;
         float t = Mathf.Clamp01(timeSinceBottom / duration);
 
@@ -69,6 +96,7 @@ public class CubeFall : MonoBehaviour
         {
             if (!done)
             {
+                unsubscribe();
                 deleteCube?.Invoke();
                 Destroy(gameObject);
             }

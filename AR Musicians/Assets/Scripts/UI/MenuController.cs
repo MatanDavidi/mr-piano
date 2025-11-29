@@ -23,6 +23,10 @@ public class MenuController : MonoBehaviour
 
     [SerializeField]
     private GameObject cvPlaneDefinitionMenu;
+    [SerializeField]
+    private GameObject singleplayerPauseMenu;
+    [SerializeField]
+    private GameObject multiplayerPauseMenu;
 
     [SerializeField]
     private PianoManager pianoManager;
@@ -31,9 +35,13 @@ public class MenuController : MonoBehaviour
     private Button[] instrumentButtons;
     [SerializeField]
     private Button[] songSelectionButtons;
+    [SerializeField]
+    private NoteCubeManager noteCubeManager;
 
     [SerializeField]
     public Button multiplayerStart;
+    [SerializeField]
+    private Button resumeMultiplayerButton;
     #endregion
 
     #region Private fields
@@ -44,6 +52,16 @@ public class MenuController : MonoBehaviour
     {
         multiplayerButton.interactable = ProjectConfig.Settings.enableMultiplayer;
         PianoManager.OnPlaneDefined += HandlePlaneDefined;
+    }
+
+    public void Update()
+    {
+        bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+        if (!multiplayer && noteCubeManager.playing && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
+        {
+            noteCubeManager.Pause();
+            ShowSingleplayerPauseMenu();
+        }
     }
 
     #region Event handlers
@@ -61,6 +79,19 @@ public class MenuController : MonoBehaviour
         manualPlaneDefinitionMenu.SetActive(false);
         cvPlaneDefinitionMenu.SetActive(false);
         multiplayerLobbyMenu.SetActive(false);
+        singleplayerPauseMenu.SetActive(false);
+        multiplayerPauseMenu.SetActive(false);
+    }
+    public void ShowMultiplayerPauseMenu(bool masterPauser)
+    {
+        HideAllMenus();
+        multiplayerPauseMenu.SetActive(true);
+        resumeMultiplayerButton.interactable = masterPauser;
+    }
+    public void ShowSingleplayerPauseMenu()
+    {
+        HideAllMenus();
+        singleplayerPauseMenu.SetActive(true);
     }
     public void ShowMultiplayerMenu()
     {
@@ -72,13 +103,6 @@ public class MenuController : MonoBehaviour
     {
         HideAllMenus();
         instrumentDetectorMenu.SetActive(true);
-    }
-
-    public void HideInstrumentDetectorMenu()
-    {
-        HideAllMenus();
-        // TODO: This is wrong. Only do this when automatic is false. I wouldn't do it here.
-        manualPlaneDefinitionMenu.SetActive(true);
     }
 
     public void ShowManualPlaneDefinitionMenu()

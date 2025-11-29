@@ -15,4 +15,6 @@ public class ProjectSettings : ScriptableObject
 
     // can this player choose songs etc. Only relevant for multiplayer, should always be true otherwise
     public bool master = true;
+
+    public bool playing = false;
 }
