@@ -22,6 +22,9 @@ public class MenuController : MonoBehaviour
     private GameObject manualPlaneDefinitionMenu;
 
     [SerializeField]
+    private GameObject cvPlaneDefinitionMenu;
+
+    [SerializeField]
     private PianoManager pianoManager;
 
     [SerializeField]
@@ -56,6 +59,7 @@ public class MenuController : MonoBehaviour
         joinRoomMenu.SetActive(false);
         instrumentDetectorMenu.SetActive(false);
         manualPlaneDefinitionMenu.SetActive(false);
+        cvPlaneDefinitionMenu.SetActive(false);
         multiplayerLobbyMenu.SetActive(false);
     }
     public void ShowMultiplayerMenu()
@@ -75,6 +79,17 @@ public class MenuController : MonoBehaviour
         HideAllMenus();
         // TODO: This is wrong. Only do this when automatic is false. I wouldn't do it here.
         manualPlaneDefinitionMenu.SetActive(true);
+    }
+
+    public void ShowManualPlaneDefinitionMenu()
+    {
+        HideAllMenus();
+        manualPlaneDefinitionMenu.SetActive(true);
+    }
+    public void ShowCVPlaneDefinitionMenu()
+    {
+        HideAllMenus();
+        cvPlaneDefinitionMenu.SetActive(true);
     }
 
     public void ShowCreateRoomMenu()
