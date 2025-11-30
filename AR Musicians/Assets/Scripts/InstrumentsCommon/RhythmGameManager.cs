@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 public class RhythmGameManager : MonoBehaviour
 {
     [Header("References")]
-    public MenuController menucontroller;
+    public MenuControllerGeneric menucontroller;
     public AudioSource audioSource;
 
     // This handles the specific logic for Piano OR Bongos
