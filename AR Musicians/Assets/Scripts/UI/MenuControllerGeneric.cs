@@ -32,7 +32,7 @@ public class MenuControllerGeneric : MonoBehaviour
 
     [Space(10)]
     [Header("Piano Components")]
-    [SerializeField] private PianoManager pianoManager;
+    [SerializeField] private PianoManagerInstrumentDefiner pianoManager;
     [SerializeField] private PianoStrategy pianoStrategy;
 
     [Space(10)]
@@ -48,7 +48,7 @@ public class MenuControllerGeneric : MonoBehaviour
 
         // Subscribe to BOTH events
         if (pianoManager != null)
-            PianoManager.OnPlaneDefined += HandlePianoDefined;
+            PianoManagerInstrumentDefiner.OnPlaneDefined += HandlePianoDefined;
 
         if (BongosManager != null)
             BongosManager.OnBongoDefined += HandleBongoDefined;
@@ -57,7 +57,7 @@ public class MenuControllerGeneric : MonoBehaviour
     private void OnDestroy()
     {
         // Clean up events to prevent memory leaks
-        if (pianoManager != null) PianoManager.OnPlaneDefined -= HandlePianoDefined;
+        if (pianoManager != null) PianoManagerInstrumentDefiner.OnPlaneDefined -= HandlePianoDefined;
         if (BongosManager != null) BongosManager.OnBongoDefined -= HandleBongoDefined;
     }
 
@@ -143,13 +143,17 @@ public class MenuControllerGeneric : MonoBehaviour
 
     private void HandleBongoDefined(DefinedCircle circle)
     {
+        int i = 0;
+        Debug.Log($"Voglio piangere {++i}");
         // 1. Stop the Setup Manager (Bongos need 2 circles, so the manager handles checking if it's done)
         // If BongosManager.IsActive becomes false automatically after 2nd drum, we are good.
         if (!BongosManager.IsActive)
         {
+            Debug.Log($"Voglio piangere {++i}");
             // 2. Configure Game Manager to use Bongo Strategy
             if (rhythmGameManager != null)
             {
+                Debug.Log($"Voglio piangere {++i}");
                 rhythmGameManager.SetStrategy(bongoStrategy);
             }
 

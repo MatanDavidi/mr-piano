@@ -65,15 +65,19 @@ public class PlaneController : MonoBehaviour
 
         // Compute keycenter positions with the corresponding width
         float currentX = -0.5f;
+        Debug.Log($"Getting world width for all keys");
         for (int i = 0; i < totalKeys; i++)
         {
+            Debug.Log($"Getting world width for ${i + 1}th key");
             bool isWhite = pattern[(leftmostKeyIndex + i) % 12];
             float wUnits = isWhite ? whiteWidthUnit : blackWidthUnit;
             float worldWidth = wUnits * unitToLocal; // width of the key in local space
 
             float centerX = currentX + worldWidth / 2f;
             localKeyCenters.Add(new Vector3(centerX, 0.5f, 0f)); // spawn at the top of the plane (total height is 1 in local space, since center is (0,0), 0.5 is at the top)
+            Debug.Log($"Adding world width {worldWidth} to keyWidths");
             keyWidths.Add(worldWidth);
+            Debug.Log($"Added world width {worldWidth} to keyWidths");
 
             currentX += worldWidth;
         }

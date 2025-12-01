@@ -5,7 +5,6 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 public class MultiplayerController : MonoBehaviourPunCallbacks

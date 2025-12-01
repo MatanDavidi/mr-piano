@@ -38,7 +38,7 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
 
     public void SpawnNote(NoteEvent note, float gameSpeed)
     {
-        // --- Exact Logic from your original SpawnCube ---
+        // --- Exact Logic from original SpawnCube ---
         float velocity = plane.height / fallTime;
         float blockHeight = velocity * note.duration;
 
