@@ -66,10 +66,14 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
 
         Vector3 offset = (isLeft ? -rightDir : rightDir) * spawnDistance;
         Vector3 startPos = targetPos + offset;
+        sphere.transform.position = startPos;
 
         // Add Behavior
         var behavior = sphere.AddComponent<BongoNoteBehavior>();
         behavior.Configure(this, startPos, targetPos, approachTime);
+        RhythmGameManager.OnPause += behavior.OnPause;
+        RhythmGameManager.OnResume += behavior.OnResume;
+        RhythmGameManager.OnQuit += behavior.OnQuit;
     }
 
     public void NotifyNoteDone()

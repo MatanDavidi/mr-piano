@@ -14,8 +14,10 @@ public class CubeFallBehavior : MonoBehaviour
     public float origBlockHeight, blockDepth;
     private float spawnTime;
     private float keyWidth;
+    public float pauseTime = 0;
 
     private bool done = false;
+    private bool paused = false;
 
     public void Configure(PianoStrategy strat, PlaneController p, NoteEvent note, float fall, float height, float depth, int keyIndex)
     {
@@ -35,9 +37,35 @@ public class CubeFallBehavior : MonoBehaviour
         spawnTime = Time.time;
     }
 
+    public void OnPause()
+    {
+        paused = true;
+    }
+
+    public void OnResume(float newPauseTime)
+    {
+        pauseTime += newPauseTime;
+        paused = false;
+    }
+
+    private void unsubscribe()
+    {
+        RhythmGameManager.OnPause -= OnPause;
+        RhythmGameManager.OnQuit -= OnQuit;
+        RhythmGameManager.OnResume -= OnResume;
+    }
+    public void OnQuit()
+    {
+        unsubscribe();
+        strategy.NotifyNoteDone();
+        Destroy(gameObject);
+    }
+
     void Update()
     {
-        float timeSinceSpawn = Time.time - spawnTime;
+        if (paused)
+            return;
+        float timeSinceSpawn = Time.time - spawnTime - pauseTime;
         if (timeSinceSpawn >= fallTime)
         {
             Stretch();  // we already reached the bottom, we have to handle this differently now
@@ -61,7 +89,7 @@ public class CubeFallBehavior : MonoBehaviour
 
     void Stretch()
     {
-        float timeSinceSpawn = Time.time - spawnTime;
+        float timeSinceSpawn = Time.time - spawnTime - pauseTime;
         float timeSinceBottom = timeSinceSpawn - fallTime;
         float t = Mathf.Clamp01(timeSinceBottom / duration);
 
@@ -83,6 +111,7 @@ public class CubeFallBehavior : MonoBehaviour
         {
             if (!done)
             {
+                unsubscribe();
                 strategy.NotifyNoteDone();
                 Destroy(gameObject);
             }

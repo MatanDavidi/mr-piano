@@ -11,6 +11,8 @@ public class BongoNoteBehavior : MonoBehaviour
     private Vector3 start, end;
     private float duration;
     private float startTime;
+    private bool paused = false;
+    private float pauseTime = 0;
 
     public void Configure(BongoStrategy strat, Vector3 s, Vector3 e, float time)
     {
@@ -20,12 +22,37 @@ public class BongoNoteBehavior : MonoBehaviour
         duration = time;
         startTime = Time.time;
     }
+    public void OnPause()
+    {
+        paused = true;
+    }
 
+    public void OnResume(float newPauseTime)
+    {
+        pauseTime += newPauseTime;
+        paused = false;
+    }
+
+    private void unsubscribe()
+    {
+        RhythmGameManager.OnPause -= OnPause;
+        RhythmGameManager.OnQuit -= OnQuit;
+        RhythmGameManager.OnResume -= OnResume;
+    }
+    public void OnQuit()
+    {
+        unsubscribe();
+        strategy.NotifyNoteDone();
+        Destroy(gameObject);
+    }
     void Update()
     {
-        float t = (Time.time - startTime) / duration;
+        if (paused)
+            return;
+        float t = (Time.time - startTime - pauseTime) / duration;
         if (t > 1.0f)
         {
+            unsubscribe();
             strategy.NotifyNoteDone();
             Destroy(gameObject);
             return;

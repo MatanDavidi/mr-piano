@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
+using System;
 
 public class RhythmGameManager : MonoBehaviour
 {
@@ -19,7 +20,16 @@ public class RhythmGameManager : MonoBehaviour
 
     private List<NoteEvent> notes = new List<NoteEvent>();
     private float songStartTime;
-    private bool started = false;
+    public bool playing = false;
+    public bool quit = false;
+    private float totalPauseTime = 0; // seconds we spent paused
+
+    private float pauseBegin = 0;
+
+    public static event Action<float> OnResume;
+    public static event Action OnPause;
+    public static event Action OnQuit;
+
 
     // We count active notes to know when the song is truly "done" visually
     private int activeNoteCount = 0;
@@ -56,9 +66,36 @@ public class RhythmGameManager : MonoBehaviour
 
         // Use the strategy's specific lookahead time (FallTime or ApproachTime)
         songStartTime = Time.time + currentStrategy.ApproachTime;
-        started = true;
+        playing = true;
+        ProjectConfig.Settings.playing = true;
+        totalPauseTime = 0;
+        quit = false;
 
-        StartCoroutine(PlayAudioWithDelay(currentStrategy.ApproachTime));
+        //StartCoroutine(PlayAudioWithDelay(currentStrategy.ApproachTime));
+    }
+
+    public void Pause()
+    {
+        ProjectConfig.Settings.playing = false;
+        playing = false;
+        pauseBegin = Time.time;
+        OnPause?.Invoke();
+    }
+
+    public void Resume()
+    {
+        ProjectConfig.Settings.playing = true;
+        playing = true;
+        float curPauseTime = Time.time - pauseBegin;
+        totalPauseTime += curPauseTime;
+        OnResume?.Invoke(curPauseTime);
+    }
+
+    public void Quit()
+    {
+        quit = true;
+        OnQuit?.Invoke();
+        OnFinished();
     }
 
     IEnumerator PlayAudioWithDelay(float delay)
@@ -108,7 +145,7 @@ public class RhythmGameManager : MonoBehaviour
 
     void Update()
     {
-        if (!started) return;
+        if (!playing) return;
 
         // Check if song is over
         if (notes.Count == 0 && activeNoteCount <= 0)
@@ -117,7 +154,7 @@ public class RhythmGameManager : MonoBehaviour
             return;
         }
 
-        float elapsed = Time.time - songStartTime;
+        float elapsed = Time.time - songStartTime - totalPauseTime;
 
         foreach (var note in notes.ToArray())
         {
@@ -137,7 +174,10 @@ public class RhythmGameManager : MonoBehaviour
 
     public void OnFinished()
     {
-        started = false;
+        playing = false;
+        ProjectConfig.Settings.playing = false;
+        totalPauseTime = 0;
         menucontroller.ShowSongMenu();
+        return;
     }
 }

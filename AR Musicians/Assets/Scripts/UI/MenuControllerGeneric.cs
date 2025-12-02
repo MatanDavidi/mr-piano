@@ -15,6 +15,9 @@ public class MenuControllerGeneric : MonoBehaviour
     public GameObject createRoomMenu;
     public GameObject joinRoomMenu;
     public GameObject multiplayerLobbyMenu;
+    public GameObject singleplayerPauseMenu;
+    public GameObject multiplayerPauseMenu;
+
 
     [Header("Setup Menus")]
     [SerializeField] private GameObject manualPlaneDefinitionMenu;
@@ -25,6 +28,7 @@ public class MenuControllerGeneric : MonoBehaviour
     [SerializeField] public Button multiplayerStart;
     [SerializeField] private Button[] instrumentButtons;
     [SerializeField] private Button[] songSelectionButtons;
+    [SerializeField] private Button resumeMultiplayerButton;
 
     [Header("Managers & Strategies")]
     [SerializeField] private RhythmGameManager rhythmGameManager; // The generic game manager
@@ -53,6 +57,15 @@ public class MenuControllerGeneric : MonoBehaviour
         if (BongosManager != null)
             BongosManager.OnBongoDefined += HandleBongoDefined;
     }
+    public void Update()
+    {
+        bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+        if (!multiplayer && rhythmGameManager.playing && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
+        {
+            rhythmGameManager.Pause();
+            ShowSingleplayerPauseMenu();
+        }
+    }
 
     private void OnDestroy()
     {
@@ -76,6 +89,19 @@ public class MenuControllerGeneric : MonoBehaviour
         manualPlaneDefinitionMenu.SetActive(false);
         cvPlaneDefinitionMenu.SetActive(false);
         multiplayerLobbyMenu.SetActive(false);
+        singleplayerPauseMenu.SetActive(false);
+        multiplayerPauseMenu.SetActive(false);
+    }
+    public void ShowMultiplayerPauseMenu(bool masterPauser)
+    {
+        HideAllMenus();
+        multiplayerPauseMenu.SetActive(true);
+        resumeMultiplayerButton.interactable = masterPauser;
+    }
+    public void ShowSingleplayerPauseMenu()
+    {
+        HideAllMenus();
+        singleplayerPauseMenu.SetActive(true);
     }
 
     public void ShowMainMenu()

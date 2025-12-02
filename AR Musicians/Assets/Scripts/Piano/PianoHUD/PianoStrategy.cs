@@ -63,6 +63,9 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         // Behavior
         var fall = cube.AddComponent<CubeFallBehavior>(); // Renamed from CubeFall to be generic
         fall.Configure(this, plane, note, fallTime, blockHeight, blockDepth, note.keyIndex);
+        RhythmGameManager.OnPause += fall.OnPause;
+        RhythmGameManager.OnResume += fall.OnResume;
+        RhythmGameManager.OnQuit += fall.OnQuit;
     }
 
     // Called by the behavior when it's done
