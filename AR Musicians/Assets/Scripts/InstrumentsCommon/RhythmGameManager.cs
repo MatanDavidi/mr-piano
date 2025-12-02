@@ -64,8 +64,8 @@ public class RhythmGameManager : MonoBehaviour
     IEnumerator PlayAudioWithDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        audioSource.pitch = gameSpeed;
-        audioSource.Play();
+        //audioSource.pitch = gameSpeed;
+        //audioSource.Play();
         // Resync to ensure exact timing
         songStartTime = Time.time;
     }

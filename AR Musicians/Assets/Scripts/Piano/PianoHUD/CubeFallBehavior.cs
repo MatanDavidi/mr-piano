@@ -17,7 +17,7 @@ public class CubeFallBehavior : MonoBehaviour
 
     private bool done = false;
 
-    public void Configure(PianoStrategy strat, PlaneController p, NoteEvent note, float fall, float height, float depth)
+    public void Configure(PianoStrategy strat, PlaneController p, NoteEvent note, float fall, float height, float depth, int keyIndex)
     {
         this.strategy = strat;
         this.plane = p;
@@ -26,6 +26,7 @@ public class CubeFallBehavior : MonoBehaviour
         this.fallTime = fall;
         this.origBlockHeight = height;
         this.blockDepth = depth;
+        this.keyIndex = keyIndex;
     }
 
     void Start()

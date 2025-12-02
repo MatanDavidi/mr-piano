@@ -97,7 +97,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
     public void Deactivate()
     {
         if (cvPlaneFinder != null) cvPlaneFinder.Deactivate();
-        base.ResetDefinition();
+        //base.ResetDefinition()
         IsActive = false;
     }
 
@@ -128,6 +128,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
     /// <summary>
     /// Called automatically by InstrumentDefiner when capturedPoints.Count >= requiredPoints (3).
+
     /// </summary>
     protected override void FinalizeDefinition()
     {
@@ -226,6 +227,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
             GameObject anchor = Instantiate(pointPrefab, planeAnchors[index], Quaternion.identity);
             // We store it in our specific array to move it later
             anchorPrefabs[index] = anchor;
+            anchor.transform.localScale = Vector3.one * pointSize;
             // Also track in generic list for cleanup
             if (setupGameObjects == null) setupGameObjects = new LinkedList<GameObject>();
             setupGameObjects.AddLast(anchor);

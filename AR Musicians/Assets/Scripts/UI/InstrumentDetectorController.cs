@@ -1,13 +1,16 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InstrumentDetectorController : MonoBehaviour
 {
     bool automatic = true;
     public PianoManager pianoManager;
     public MenuController menuController;
-    public void OnToggle(bool automatic)
+    [SerializeField]
+    private Toggle automaticToggle;
+    public void OnToggle()
     {
-        this.automatic = automatic;
+        this.automatic = automaticToggle.isOn;
     }
 
     public void OnPianoPress()
@@ -16,7 +19,8 @@ public class InstrumentDetectorController : MonoBehaviour
         if (automatic)
         {
             menuController.ShowCVPlaneDefinitionMenu();
-        } else
+        }
+        else
         {
             menuController.ShowManualPlaneDefinitionMenu();
         }

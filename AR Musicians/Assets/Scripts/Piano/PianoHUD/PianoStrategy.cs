@@ -14,12 +14,12 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
     private void Start()
     {
         // Listen for plane definition (moved from Manager)
-        PianoManager.OnPlaneDefined += UpdatePlaneVisuals;
+        PianoManagerInstrumentDefiner.OnPlaneDefined += UpdatePlaneVisuals;
     }
 
     private void OnDestroy()
     {
-        PianoManager.OnPlaneDefined -= UpdatePlaneVisuals;
+        PianoManagerInstrumentDefiner.OnPlaneDefined -= UpdatePlaneVisuals;
     }
 
     // Interface Implementation
@@ -62,7 +62,7 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
 
         // Behavior
         var fall = cube.AddComponent<CubeFallBehavior>(); // Renamed from CubeFall to be generic
-        fall.Configure(this, plane, note, fallTime, blockHeight, blockDepth);
+        fall.Configure(this, plane, note, fallTime, blockHeight, blockDepth, note.keyIndex);
     }
 
     // Called by the behavior when it's done
