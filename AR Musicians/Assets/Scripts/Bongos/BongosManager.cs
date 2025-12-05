@@ -20,17 +20,29 @@ public class BongosManager : InstrumentDefiner
     [SerializeField] private Color leftDrumColor = Color.cyan;
     [SerializeField] private Color rightDrumColor = Color.magenta;
 
+    [Header("Circle Detectors")]
+    [SerializeField] private CVCircleFinder cvCircleFinder;
+
     // Event to notify game logic (fired once for Left, once for Right)
     public static event Action<DefinedCircle> OnBongoDefined;
 
     private SetupPhase currentPhase = SetupPhase.DefiningLeftHembra;
 
     // We override Activate to ensure state is reset correctly every time we start fresh
-    public override void Activate()
+    public void Activate(bool automatic)
     {
-        base.Activate();
+        IsActive = true;
         currentPhase = SetupPhase.DefiningLeftHembra;
         Debug.Log("Bongo Setup Started: Please define the LEFT drum (Hembra).");
+
+        if (automatic)
+        {
+            Debug.Log("Bongo Manager activated in CV mode.");
+            cvCircleFinder.Activate();
+        } else
+        {
+            base.Activate();
+        }
     }
 
     protected override void UpdateDrawing()

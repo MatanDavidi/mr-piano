@@ -60,10 +60,10 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
         picture.Apply();
 
         Vector2[] kpts = modelManager.RunInference(cameraAccess.GetTexture());
-        Ray[] rays = new Ray[kpts.Length];
+        Ray[] rays = new Ray[kpts.Length - 1];
 
         // Parse the keypoitns to rays
-        for (int i = 0; i < kpts.Length; i++)
+        for (int i = 0; i < kpts.Length - 1; i++)
         {
             Vector2 kpt = kpts[i];
             int y = picture.height - Mathf.FloorToInt(kpt.y);
@@ -114,7 +114,7 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
                 manager.RegisterPoint(hit.point);
             } else
             {
-                Debug.Log("No hitpoitn found...");
+                Debug.Log("No hitpoint found...");
             }
         }
     }

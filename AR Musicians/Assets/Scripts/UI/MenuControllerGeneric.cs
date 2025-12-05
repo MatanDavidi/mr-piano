@@ -119,7 +119,7 @@ public class MenuControllerGeneric : MonoBehaviour
         manualPlaneDefinitionMenu.SetActive(true); // Keep existing UI
 
         // 1. Activate the Manager
-        pianoManager.Activate(true); // false = manual mode
+        pianoManager.Activate(false); // false = manual mode
 
         // 2. Tell the Raycaster to talk to the PianoManager
         // (Assuming RayCastInputProvider has a SetListener method as discussed previously)
@@ -143,7 +143,7 @@ public class MenuControllerGeneric : MonoBehaviour
         manualPlaneDefinitionMenu.SetActive(true);
 
         // 1. Activate Bongo Manager
-        BongosManager.Activate();
+        BongosManager.Activate(false);
 
         // 2. Tell Raycaster to talk to BongosManager
         if (inputProvider != null)
@@ -230,6 +230,13 @@ public class MenuControllerGeneric : MonoBehaviour
         cvPlaneDefinitionMenu.SetActive(true);
         // CV Logic usually specific to Piano for now
         pianoManager.Activate(true);
+    }
+
+    public void ShowCVCircleDefinitionMenu()
+    {
+        HideAllMenus();
+        cvPlaneDefinitionMenu.SetActive(true);
+        BongosManager.Activate(true);
     }
 
     public void ShowCreateRoomMenu()

@@ -39,6 +39,8 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
     // State variables
     private bool inCorrectionMode = false; // New state: after 3 points, before final confirm
+    private float sideLength = 0.0f;
+
 
     // Piano specific arrays that the correctors need
     private Vector3[] planeAnchors; // Stores the 4 corrected corners
@@ -104,7 +106,8 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
     public void Deactivate()
     {
         if (cvPlaneFinder != null) cvPlaneFinder.Deactivate();
-        //base.ResetDefinition()
+        if (leftCornerCorrecorNode != null) leftCornerCorrecorNode.SetActive(false);
+        if (rightCornerCorrectorNode != null) rightCornerCorrectorNode.SetActive(false);
         IsActive = false;
     }
 
@@ -154,10 +157,10 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
         // 2. Calculate the "side length" based on the user's 3rd click
         // Distance from P1 (Top Right) to P2 (Bottom Right approximation)
-        float sideLength = (capturedPoints[2] - capturedPoints[1]).magnitude;
+        sideLength = (capturedPoints[2] - capturedPoints[1]).magnitude;
 
         // 3. Calculate 3rd and 4th points mathematically (Perpendicular)
-        SetBottomCorners(sideLength);
+        SetBottomCorners();
 
         // 4. Setup Visuals for Correction Mode
         // We need to transfer the visuals from the base class (spawnedVisuals) 
@@ -218,7 +221,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
     // --- PIANO SPECIFIC LOGIC ---
 
-    private void SetBottomCorners(float sideLength)
+    private void SetBottomCorners()
     {
         Vector3 baseLine = planeAnchors[1] - planeAnchors[0];
         Vector3 edgeVector = sideLength * Vector3.Cross(baseLine, Vector3.up).normalized;
@@ -262,11 +265,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
     {
         // Update the specific anchor
         planeAnchors[index] += delta;
-
-        // Recalculate the rest of the shape based on the new top width
-        float currentSideLength = Vector3.Distance(planeAnchors[1], planeAnchors[2]);
-        SetBottomCorners(currentSideLength);
-
+        SetBottomCorners();
         UpdateVisuals();
     }
 
