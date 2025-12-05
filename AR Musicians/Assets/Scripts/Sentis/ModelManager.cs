@@ -92,66 +92,6 @@ public class ModelManager : MonoBehaviour
         return kpts;
     }
 
-    //public void RunInferenceAsync(Texture targetTexture)
-    //{
-    //    TensorShape inputShape = new TensorShape(1, 3, targetTexture.height, targetTexture.width);
-    //    Tensor<float> input = new Tensor<float>(inputShape);
-    //    TextureConverter.ToTensor(targetTexture, input);
-
-    //    var inputCpu = input.ReadbackAndClone();
-    //    SaveTensorForPyTorch(inputCpu, "input.tensor");
-
-    //    // 1️⃣ Schedule normalization worker
-    //    normWorker.Schedule(input);
-
-    //    // 2️⃣ Read normalization output asynchronously
-    //    var normOutput = normWorker.PeekOutput() as Tensor<float>;
-    //    var awaiter1 = normOutput.ReadbackAndCloneAsync().GetAwaiter();
-    //    awaiter1.OnCompleted(() =>
-    //    {
-    //        var cpuNormOutput = awaiter1.GetResult();
-    //        SaveTensorForPyTorch(cpuNormOutput, "normalized.tensor");
-
-    //        UnityEngine.Debug.Log("Normalization finished.");
-    //        // 3️⃣ Schedule main worker AFTER normalization is ready
-    //        worker.Schedule(normOutput);
-
-    //        // 4️⃣ Read main output asynchronously
-    //        //var output = worker.PeekOutput("kpts") as Tensor<float>;
-    //        //var awaiter2 = output.ReadbackAndCloneAsync().GetAwaiter();
-    //        //awaiter2.OnCompleted(() =>
-    //        //{
-    //        //    var cpuOutput = awaiter2.GetResult();
-    //        //    SaveTensorForPyTorch(cpuOutput, "kpts.tensor");
-
-    //        //    Vector2[] kpts = parseKeyPoints(cpuOutput);
-    //        //    foreach (Vector2 kpt in kpts)
-    //        //        UnityEngine.Debug.Log($"[{kpt.x}, {kpt.y}]");
-
-    //        //    UnityEngine.Debug.Log($"Inference complete, output shape: {cpuOutput.shape}");
-
-    //        //    // Clean up
-    //        //    input.Dispose();
-    //        //    cpuOutput.Dispose();
-    //        //    normOutput.Dispose();
-    //        //});
-
-    //        var output = worker.PeekOutput("heatmaps") as Tensor<float>;
-    //        var awaiter2 = output.ReadbackAndCloneAsync().GetAwaiter();
-    //        awaiter2.OnCompleted(() =>
-    //        {
-    //            var cpuOutput = awaiter2.GetResult();
-    //            SaveTensorForPyTorch(cpuOutput, "heatmaps.tensor");
-    //            UnityEngine.Debug.Log($"Inference complete, output shape: {cpuOutput.shape}");
-
-    //            // Clean up
-    //            input.Dispose();
-    //            cpuOutput.Dispose();
-    //            normOutput.Dispose();
-    //        });
-    //    });
-    //}
-
     public Vector2[] parseKeyPoints(Tensor<float> tensor)
     {
         Vector2[] kpts = new Vector2[4];

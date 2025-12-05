@@ -24,7 +24,8 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
     [Header("Plane Detectors")]
     // RayCastPlaneFinder is removed because we now use the generic RayCastInputProvider
-    [SerializeField] private CVPlaneFinder cvPlaneFinder;
+    [SerializeField] private CVPlaneFinderGeneric cvPlaneFinder;
+
     #endregion
 
     #region Events
@@ -76,14 +77,20 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
     public void Activate(bool automatic)
     {
+        IsActive = true;
         // Reset local piano state
         ResetDefinition();
 
+        Debug.Log("Starting the Piano Manager..");
+
         if (automatic)
         {
+            Debug.Log("Piano Manager activated in CV mode.");
             // If CV, we bypass the generic input listener logic
-            IsActive = false;
-            if (cvPlaneFinder != null) cvPlaneFinder.Activate();
+            if (cvPlaneFinder != null)
+                cvPlaneFinder.Activate();
+            else
+                Debug.Log("cvPlaneFinder was null...");
         }
         else
         {

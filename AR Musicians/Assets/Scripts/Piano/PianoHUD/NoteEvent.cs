@@ -11,6 +11,7 @@ public class NoteEvent
     public float duration;
 
     public int keyIndex;
+
 }
 
 [System.Serializable]

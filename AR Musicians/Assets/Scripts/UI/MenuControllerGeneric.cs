@@ -119,7 +119,7 @@ public class MenuControllerGeneric : MonoBehaviour
         manualPlaneDefinitionMenu.SetActive(true); // Keep existing UI
 
         // 1. Activate the Manager
-        pianoManager.Activate(false); // false = manual mode
+        pianoManager.Activate(true); // false = manual mode
 
         // 2. Tell the Raycaster to talk to the PianoManager
         // (Assuming RayCastInputProvider has a SetListener method as discussed previously)

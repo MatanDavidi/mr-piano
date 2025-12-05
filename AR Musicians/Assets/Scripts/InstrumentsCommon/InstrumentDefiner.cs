@@ -38,7 +38,9 @@ public abstract class InstrumentDefiner : MonoBehaviour, IPointInputListener
 
     public virtual void RegisterPoint(Vector3 worldPosition)
     {
+        Debug.Log("Registering point: " + worldPosition);
         if (isDefined) return;
+        Debug.Log("Start handling the point");
 
         capturedPoints.Add(worldPosition);
 

@@ -1,35 +1,26 @@
-using Meta.XR;
 using UnityEngine;
+using Meta.XR;
 
-public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
+public class CVCircleFinder : MonoBehaviour
 {
+    [Header("Manager")]
+    [SerializeField] private BongosManager manager;
+    public bool active;
+
     [Header("Configuration")]
     public EnvironmentRaycastManager raycastManager;
-
-
-    #region Serialized
-    // Camera access object which enables fetching the image feed etc.
     [SerializeField] private PassthroughCameraAccess cameraAccess;
-
-    // QuadRenderer which is used to render the image with the found keypoints for debugging.
     [SerializeField] private Renderer quadRenderer;
-
-    // ML Model manager for inference
     [SerializeField] private ModelManager modelManager;
-    #endregion
-
-    // Texture which stores the camera feed
     private Texture2D picture;
 
-
-    private void Start()
+    void Start()
     {
-        // Fixes weird bug that even though it shoudl be contained in the 
         UnityEngine.Android.Permission.RequestUserPermission("horizonos.permission.HEADSET_CAMERA");
         quadRenderer.enabled = false;
     }
 
-
+    // Update is called once per frame
     void Update()
     {
         if (cameraAccess.IsPlaying)
@@ -82,11 +73,7 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
         quadRenderer.material.mainTexture = picture;
     }
 
-    /// <summary>
-    /// Draws keypoitns on top of the picture.
-    /// </summary>
-    /// <param name="picture">The picture texture.</param>
-    /// <param name="kpts">Array of keypoints in pixel space.</param>
+
     void drawQuad(Texture2D picture, Vector2[] kpts)
     {
         int width = 3; // width of the quad in image space.
@@ -119,17 +106,15 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
         }
     }
 
-    override public void Activate()
+    public void Activate()
     {
-        Debug.Log("CVPlaneFinderGeneric: Activated");
-        base.Activate();
+        active = true;
         quadRenderer.enabled = true;
     }
 
-    public override void Deactivate()
+    public void Deactivate()
     {
-        base.Deactivate();
+        active = false;
         quadRenderer.enabled = false;
     }
-    
 }

@@ -87,6 +87,8 @@ public class MultiplayerControllerGeneric : MonoBehaviourPunCallbacks
     // Someone in the lobby pressed the pause button
     private void OnPauseNetwork()
     {
+        if (rhythmGameManager.quit)
+            return;
         rhythmGameManager.Pause();
         menuController.ShowMultiplayerPauseMenu(masterPauser || master);
         masterPauser = false;
