@@ -55,7 +55,7 @@ public class CameraViewer : MonoBehaviour
         picture.SetPixels32(colors);
         picture.Apply();
 
-        Vector2[] kpts = modelManager.RunInference(cameraAccess.GetTexture());
+        Vector2[] kpts = modelManager.RunInference(cameraAccess.GetTexture(), 4);
         Ray[] rays = new Ray[kpts.Length];
 
         // Parse the keypoitns to rays

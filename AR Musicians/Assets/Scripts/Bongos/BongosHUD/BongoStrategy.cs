@@ -55,28 +55,29 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
         bool isLeft = note.keyIndex < average_key;
         DefinedCircle targetDrum = isLeft ? leftDrum.Value : rightDrum.Value;
 
-        GameObject sphere = Instantiate(noteSpherePrefab);
+        GameObject noteObj = Instantiate(noteSpherePrefab);
 
-        // Visual Setup
-        if (sphere.TryGetComponent<Renderer>(out var r)) r.material.color = isLeft ? Color.cyan : Color.magenta;
+        noteObj.transform.position = targetDrum.Center;
 
-        // Calculate Start/End positions
-        Vector3 targetPos = targetDrum.Center;
+        // Orient the object so its "Up" matches the Drum Normal.
+        // This ensures the X/Z drawing plane lies flat on the drum surface.
+        if (targetDrum.Normal != Vector3.zero)
+        {
+            noteObj.transform.rotation = Quaternion.LookRotation(Vector3.forward, targetDrum.Normal);
+        }
 
-        // Calculate a side vector relative to the drum's normal
-        Vector3 rightDir = Vector3.Cross(Vector3.up, targetDrum.Normal).normalized;
-        if (rightDir.sqrMagnitude < 0.01f) rightDir = Vector3.right;
+        Color c = isLeft ? Color.cyan : Color.magenta;
+        var arcBehavior = noteObj.GetComponent<BongoArcBehavior>();
+        if (arcBehavior == null) arcBehavior = noteObj.AddComponent<BongoArcBehavior>();
 
-        Vector3 offset = (isLeft ? -rightDir : rightDir) * spawnDistance;
-        Vector3 startPos = targetPos + offset;
-        sphere.transform.position = startPos;
+        float drumRadius = targetDrum.Radius;
 
-        // Add Behavior
-        var behavior = sphere.AddComponent<BongoNoteBehavior>();
-        behavior.Configure(this, startPos, targetPos, approachTime);
-        RhythmGameManager.OnPause += behavior.OnPause;
-        RhythmGameManager.OnResume += behavior.OnResume;
-        RhythmGameManager.OnQuit += behavior.OnQuit;
+        arcBehavior.Configure(this, isLeft, drumRadius, spawnDistance, approachTime, c);
+
+        // Events
+        RhythmGameManager.OnPause += arcBehavior.OnPause;
+        RhythmGameManager.OnResume += arcBehavior.OnResume;
+        RhythmGameManager.OnQuit += arcBehavior.OnQuit;
     }
 
 

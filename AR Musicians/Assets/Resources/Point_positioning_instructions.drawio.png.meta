@@ -281,6 +281,7 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":true,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
+<<<<<<< HEAD
       Point_positioning_instructions.drawio_0: -525465632
       Point_positioning_instructions.drawio_1: -1995449500
       Point_positioning_instructions.drawio_2: -1282116699
@@ -288,6 +289,15 @@ TextureImporter:
       Point_positioning_instructions.drawio_4: -36239999
       Point_positioning_instructions.drawio_5: -1362490073
       Point_positioning_instructions.drawio_6: 1276980167
+=======
+      Point_positioning_instructions.drawio_0: 1057652690
+      Point_positioning_instructions.drawio_1: -81659372
+      Point_positioning_instructions.drawio_2: -107483730
+      Point_positioning_instructions.drawio_3: -1611848891
+      Point_positioning_instructions.drawio_4: 1019511982
+      Point_positioning_instructions.drawio_5: -607309175
+      Point_positioning_instructions.drawio_6: 1036487649
+>>>>>>> 2d29df0dd792c7f7baebc80bb465b4e8019e53b6
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

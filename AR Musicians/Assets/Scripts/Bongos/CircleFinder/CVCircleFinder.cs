@@ -27,6 +27,7 @@ public class CVCircleFinder : MonoBehaviour
         {
             if (active && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.LTouch))
             {
+                manager.ResetDefinition();
                 TakePicture();
             }
         }
@@ -50,7 +51,7 @@ public class CVCircleFinder : MonoBehaviour
         picture.SetPixels32(colors);
         picture.Apply();
 
-        Vector2[] kpts = modelManager.RunInference(cameraAccess.GetTexture());
+        Vector2[] kpts = modelManager.RunInference(cameraAccess.GetTexture(), 6);
         Ray[] rays = new Ray[kpts.Length];
 
         // Parse the keypoitns to rays
@@ -114,7 +115,8 @@ public class CVCircleFinder : MonoBehaviour
 
     public void Deactivate()
     {
-        active = false;
+        Debug.Log("Deactiving the cv circle finder...");
         quadRenderer.enabled = false;
+        active = false;
     }
 }
