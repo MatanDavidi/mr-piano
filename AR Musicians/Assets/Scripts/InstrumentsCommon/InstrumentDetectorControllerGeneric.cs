@@ -57,7 +57,7 @@ public class InstrumentDetectorControllerGeneric : MonoBehaviour
             // FUTURE PROOFING: 
             // Currently, CV for Bongos is not implemented. 
             // We log a warning and fall back to Manual setup so the user isn't stuck.
-            menuController.StartBongoSetup();
+            menuController.ShowCVCircleDefinitionMenu();
         }
         else
         {

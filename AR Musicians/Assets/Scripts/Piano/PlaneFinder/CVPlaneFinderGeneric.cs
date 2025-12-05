@@ -59,7 +59,7 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
         picture.SetPixels32(colors);
         picture.Apply();
 
-        Vector2[] kpts = modelManager.RunInference(cameraAccess.GetTexture());
+        Vector2[] kpts = modelManager.RunInference(cameraAccess.GetTexture(), 4);
         Ray[] rays = new Ray[kpts.Length - 1];
 
         // Parse the keypoitns to rays

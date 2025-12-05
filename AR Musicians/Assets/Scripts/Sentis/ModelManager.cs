@@ -13,6 +13,7 @@ public class ModelManager : MonoBehaviour
 {
 
     [SerializeField] private ModelAsset modelAsset;
+    [SerializeField] private bool GPU;
     //[SerializeField] private TMP_Text speedText;
 
     private Model runtimeModel;
@@ -41,7 +42,7 @@ public class ModelManager : MonoBehaviour
         AddNormalizationHead();
         runtimeModel = ModelLoader.Load(modelAsset);
         UnityEngine.Debug.Log("model loaded correctly!");
-        worker = new Worker(runtimeModel, BackendType.GPUCompute);
+        worker = new Worker(runtimeModel, GPU ? BackendType.GPUCompute : BackendType.CPU);
         UnityEngine.Debug.Log("Sentis Model Initialized!");
         WarmUpSentis();
     }
@@ -51,7 +52,7 @@ public class ModelManager : MonoBehaviour
     /// </summary>
     /// <param name="targetTexture">Input texture</param>
     /// <returns>Array of keypoints (Vector2)</returns>
-    public Vector2[] RunInference(Texture targetTexture)
+    public Vector2[] RunInference(Texture targetTexture, int n_kpts)
     {
         TensorShape inputShape = new TensorShape(1, 3, targetTexture.height, targetTexture.width);
         Tensor<float> input = new Tensor<float>(inputShape);
@@ -74,7 +75,7 @@ public class ModelManager : MonoBehaviour
         watch.Stop();
 
         SaveTensorForPyTorch(cpuTensor, "kpts.tensor");
-        Vector2[] kpts = parseKeyPoints(cpuTensor);
+        Vector2[] kpts = parseKeyPoints(cpuTensor, n_kpts);
 
         foreach (Vector2 kpt in kpts)
         {
@@ -92,14 +93,13 @@ public class ModelManager : MonoBehaviour
         return kpts;
     }
 
-    public Vector2[] parseKeyPoints(Tensor<float> tensor)
+    public Vector2[] parseKeyPoints(Tensor<float> tensor, int n_kpts)
     {
-        Vector2[] kpts = new Vector2[4];
-        kpts[0] = new Vector2(tensor[0, 0, 0], tensor[0, 0, 1]);
-        kpts[1] = new Vector2(tensor[0, 1, 0], tensor[0, 1, 1]);
-        kpts[2] = new Vector2(tensor[0, 2, 0], tensor[0, 2, 1]);
-        kpts[3] = new Vector2(tensor[0, 3, 0], tensor[0, 3, 1]);
-
+        Vector2[] kpts = new Vector2[n_kpts];
+        for (int i = 0; i < n_kpts; i++)
+        {
+            kpts[i] = new Vector2(tensor[0, i, 0], tensor[0, i, 1]);
+        }
         return kpts;
     }
 

@@ -22,6 +22,8 @@ public class MenuControllerGeneric : MonoBehaviour
     [Header("Setup Menus")]
     [SerializeField] private GameObject manualPlaneDefinitionMenu;
     [SerializeField] private GameObject cvPlaneDefinitionMenu;
+    [SerializeField] private GameObject manualCircleDefinitionMenu;
+    [SerializeField] private GameObject cvCircleDefinitionMenu;
 
     [Header("Buttons")]
     public Button multiplayerButton;
@@ -55,7 +57,7 @@ public class MenuControllerGeneric : MonoBehaviour
             PianoManagerInstrumentDefiner.OnPlaneDefined += HandlePianoDefined;
 
         if (BongosManager != null)
-            BongosManager.OnBongoDefined += HandleBongoDefined;
+            BongosManager.OnBothBongosDefined += HandleBongoDefined;
     }
     public void Update()
     {
@@ -71,7 +73,7 @@ public class MenuControllerGeneric : MonoBehaviour
     {
         // Clean up events to prevent memory leaks
         if (pianoManager != null) PianoManagerInstrumentDefiner.OnPlaneDefined -= HandlePianoDefined;
-        if (BongosManager != null) BongosManager.OnBongoDefined -= HandleBongoDefined;
+        if (BongosManager != null) BongosManager.OnBothBongosDefined -= HandleBongoDefined;
     }
 
     #region Event handlers & Navigation
@@ -88,6 +90,8 @@ public class MenuControllerGeneric : MonoBehaviour
         instrumentDetectorMenu.SetActive(false);
         manualPlaneDefinitionMenu.SetActive(false);
         cvPlaneDefinitionMenu.SetActive(false);
+        cvCircleDefinitionMenu.SetActive(false);
+        manualCircleDefinitionMenu.SetActive(false);
         multiplayerLobbyMenu.SetActive(false);
         singleplayerPauseMenu.SetActive(false);
         multiplayerPauseMenu.SetActive(false);
@@ -140,7 +144,7 @@ public class MenuControllerGeneric : MonoBehaviour
         HideAllMenus();
         // You might want to duplicate the manualPlaneDefinitionMenu and rename it for Bongos, 
         // or just reuse it if the text is generic enough.
-        manualPlaneDefinitionMenu.SetActive(true);
+        manualCircleDefinitionMenu.SetActive(true);
 
         // 1. Activate Bongo Manager
         BongosManager.Activate(false);
@@ -167,25 +171,20 @@ public class MenuControllerGeneric : MonoBehaviour
         HandleInstrumentDefined();
     }
 
-    private void HandleBongoDefined(DefinedCircle circle)
+    private void HandleBongoDefined()
     {
-        int i = 0;
-        Debug.Log($"Voglio piangere {++i}");
         // 1. Stop the Setup Manager (Bongos need 2 circles, so the manager handles checking if it's done)
         // If BongosManager.IsActive becomes false automatically after 2nd drum, we are good.
-        if (!BongosManager.IsActive)
-        {
-            Debug.Log($"Voglio piangere {++i}");
-            // 2. Configure Game Manager to use Bongo Strategy
-            if (rhythmGameManager != null)
-            {
-                Debug.Log($"Voglio piangere {++i}");
-                rhythmGameManager.SetStrategy(bongoStrategy);
-            }
+        BongosManager.Deactivate();
 
-            // 3. Update UI
-            HandleInstrumentDefined();
+        // 2. Configure Game Manager to use Bongo Strategy
+        if (rhythmGameManager != null)
+        {
+            rhythmGameManager.SetStrategy(bongoStrategy);
         }
+
+        // 3. Update UI
+        HandleInstrumentDefined();
     }
 
     private void HandleInstrumentDefined()
@@ -235,7 +234,7 @@ public class MenuControllerGeneric : MonoBehaviour
     public void ShowCVCircleDefinitionMenu()
     {
         HideAllMenus();
-        cvPlaneDefinitionMenu.SetActive(true);
+        cvCircleDefinitionMenu.SetActive(true);
         BongosManager.Activate(true);
     }
 

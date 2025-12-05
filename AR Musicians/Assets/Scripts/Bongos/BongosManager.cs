@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class BongosManager : InstrumentDefiner
@@ -25,13 +26,17 @@ public class BongosManager : InstrumentDefiner
 
     // Event to notify game logic (fired once for Left, once for Right)
     public static event Action<DefinedCircle> OnBongoDefined;
+    public static event Action OnBothBongosDefined;
 
     private SetupPhase currentPhase = SetupPhase.DefiningLeftHembra;
+    private List<GameObject> createdDrumVisuals = new List<GameObject>();
+    private bool inCorrectionMode = false;
 
     // We override Activate to ensure state is reset correctly every time we start fresh
     public void Activate(bool automatic)
     {
         IsActive = true;
+        ResetDefinition();
         currentPhase = SetupPhase.DefiningLeftHembra;
         Debug.Log("Bongo Setup Started: Please define the LEFT drum (Hembra).");
 
@@ -43,6 +48,28 @@ public class BongosManager : InstrumentDefiner
         {
             base.Activate();
         }
+    }
+
+    public void Deactivate()
+    {
+        if (cvCircleFinder != null) cvCircleFinder.Deactivate();
+        IsActive = false;
+    }
+
+    private void Update()
+    {
+        if (inCorrectionMode && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
+        {
+            FinishSetup();
+        }
+    }
+
+    public void FinishSetup()
+    {
+        isDefined = true;
+        IsActive = false;
+
+        OnBothBongosDefined.Invoke();
     }
 
     protected override void UpdateDrawing()
@@ -61,14 +88,45 @@ public class BongosManager : InstrumentDefiner
         }
     }
 
+    public override void ResetDefinition()
+    {
+        base.ResetDefinition();
+
+        inCorrectionMode = false;
+        currentPhase = SetupPhase.DefiningLeftHembra; // Reset logic to start with Left drum
+
+        // 1. Destroy the permanent drum visuals (Left and Right)
+        foreach (var drumObj in createdDrumVisuals)
+        {
+            if (drumObj != null) Destroy(drumObj);
+        }
+        createdDrumVisuals.Clear();
+
+        // 2. Ensure the preview LineRenderer is clean
+        if (lineRenderer != null)
+        {
+            lineRenderer.positionCount = 0;
+            lineRenderer.enabled = false;
+        }
+
+        Debug.Log("Bongo Definition Reset.");
+    }
+
     protected override void FinalizeDefinition()
     {
         if (capturedPoints.Count < 3) return;
 
         try
         {
+            // Normalize them to have the same y coordinate first
+            float y_Value = (capturedPoints[0].y + capturedPoints[1].y + capturedPoints[2].y) / 3;
+            
+            Vector3 circPoint1 = new Vector3(capturedPoints[0].x, y_Value, capturedPoints[0].z);
+            Vector3 circPoint2 = new Vector3(capturedPoints[1].x, y_Value, capturedPoints[1].z);
+            Vector3 circPoint3 = new Vector3(capturedPoints[2].x, y_Value, capturedPoints[2].z);
+
             // Calculate the Circle Math
-            DefinedCircle newCircle = CalculateCircleFrom3Points(capturedPoints[0], capturedPoints[1], capturedPoints[2]);
+            DefinedCircle newCircle = CalculateCircleFrom3Points(circPoint1, circPoint2, circPoint3);
 
             // Determine Context (Left vs Right)
             bool isLeft = (currentPhase == SetupPhase.DefiningLeftHembra);
@@ -130,8 +188,7 @@ public class BongosManager : InstrumentDefiner
     private void CompleteSetup()
     {
         currentPhase = SetupPhase.Finished;
-        isDefined = true;
-        IsActive = false;
+        inCorrectionMode = true;
 
         // Clear temp markers for the second drum
         foreach (var obj in spawnedVisuals) if (obj != null) Destroy(obj);
@@ -149,6 +206,9 @@ public class BongosManager : InstrumentDefiner
     {
         // A. Create the Line Visual
         GameObject circleObj = new GameObject(name + "_Visual");
+
+        createdDrumVisuals.Add(circleObj);
+
         LineRenderer lr = circleObj.AddComponent<LineRenderer>();
 
         // Configure LR (Copy settings from main or set defaults)
@@ -173,29 +233,6 @@ public class BongosManager : InstrumentDefiner
             Vector3 point = circle.Center + (circle.Radius * Mathf.Cos(angle) * tangent) + (circle.Radius * Mathf.Sin(angle) * binormal);
             lr.SetPosition(i, point);
         }
-
-        // B. Create the Collider/Hit Zone
-        GameObject hitZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        hitZone.name = name + "_Collider";
-        hitZone.transform.SetParent(circleObj.transform); // Group them
-
-        // Position & Rotate
-        Vector3 pos = circle.Center - (circle.Normal * (drumHeight / 2));
-        Quaternion rot = Quaternion.LookRotation(circle.Normal) * Quaternion.Euler(90, 0, 0);
-        hitZone.transform.SetPositionAndRotation(pos, rot);
-        hitZone.transform.localScale = new Vector3(circle.Radius * 2, drumHeight / 2, circle.Radius * 2);
-
-        // Material
-        var rend = hitZone.GetComponent<Renderer>();
-        rend.material = new Material(Shader.Find("Standard"));
-        SetupTransparentMaterial(rend.material, color);
-
-        // Note: We do NOT add this to 'spawnedVisuals' because we don't want it destroyed 
-        // when PrepareForNextDrum() is called. We rely on ResetDefinition() to clean these up later.
-        // If the base class doesn't have a list for permanent objects, we track them here.
-        // For now, let's register it to a generic cleanup list if possible, or just let it persist.
-        // Assuming base class has a generic Reset:
-        // We'll tag it or store it in a local list to destroy on full Reset.
     }
 
     private DefinedCircle CalculateCircleFrom3Points(Vector3 p1, Vector3 p2, Vector3 p3)
