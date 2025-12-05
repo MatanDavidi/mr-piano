@@ -100,9 +100,10 @@ public class CVCircleFinder : MonoBehaviour
             if (raycastManager.Raycast(ray, out var hit))
             {
                 manager.RegisterPoint(hit.point);
-            } else
+            }
+            else
             {
-                Debug.Log("No hitpoitn found...");
+                Debug.Log("No hitpoint found...");
             }
         }
     }

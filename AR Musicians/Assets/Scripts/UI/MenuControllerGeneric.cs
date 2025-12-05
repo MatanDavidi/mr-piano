@@ -17,6 +17,7 @@ public class MenuControllerGeneric : MonoBehaviour
     public GameObject multiplayerLobbyMenu;
     public GameObject singleplayerPauseMenu;
     public GameObject multiplayerPauseMenu;
+    public bool instrumentDefined = false;
 
 
     [Header("Setup Menus")]
@@ -28,7 +29,9 @@ public class MenuControllerGeneric : MonoBehaviour
     [Header("Buttons")]
     public Button multiplayerButton;
     [SerializeField] public Button multiplayerStart;
-    [SerializeField] private Button[] instrumentButtons;
+    [SerializeField] public Button singleplayerButton;
+
+    [SerializeField] private Button bongoButton, pianoButton;
     [SerializeField] private Button[] songSelectionButtons;
     [SerializeField] private Button resumeMultiplayerButton;
 
@@ -50,8 +53,7 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void Start()
     {
-        multiplayerButton.interactable = ProjectConfig.Settings.enableMultiplayer;
-
+        multiplayerButton.interactable = false;
         // Subscribe to BOTH events
         if (pianoManager != null)
             PianoManagerInstrumentDefiner.OnPlaneDefined += HandlePianoDefined;
@@ -111,6 +113,8 @@ public class MenuControllerGeneric : MonoBehaviour
     public void ShowMainMenu()
     {
         HideAllMenus();
+        singleplayerButton.interactable = instrumentDefined;
+        multiplayerButton.interactable = instrumentDefined && ProjectConfig.Settings.enableMultiplayer;
         mainMenu.SetActive(true);
     }
 
@@ -166,7 +170,7 @@ public class MenuControllerGeneric : MonoBehaviour
         {
             rhythmGameManager.SetStrategy(pianoStrategy);
         }
-
+        pianoButton.interactable = true;
         // 3. Update UI
         HandleInstrumentDefined();
     }
@@ -182,20 +186,14 @@ public class MenuControllerGeneric : MonoBehaviour
         {
             rhythmGameManager.SetStrategy(bongoStrategy);
         }
-
+        bongoButton.interactable = true;
         // 3. Update UI
         HandleInstrumentDefined();
     }
 
     private void HandleInstrumentDefined()
     {
-        if (instrumentButtons != null)
-        {
-            foreach (Button instrumentButton in instrumentButtons)
-            {
-                if (instrumentButton != null) instrumentButton.interactable = true;
-            }
-        }
+        instrumentDefined = true;
         ShowMainMenu();
     }
 

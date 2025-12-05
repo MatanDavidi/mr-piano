@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BongosManager : InstrumentDefiner
 {
-    private enum SetupPhase
+    public enum SetupPhase
     {
         DefiningLeftHembra,
         DefiningRightMacho,
@@ -25,7 +25,7 @@ public class BongosManager : InstrumentDefiner
     [SerializeField] private CVCircleFinder cvCircleFinder;
 
     // Event to notify game logic (fired once for Left, once for Right)
-    public static event Action<DefinedCircle> OnBongoDefined;
+    public static event Action<DefinedCircle, SetupPhase> OnBongoDefined;
     public static event Action OnBothBongosDefined;
 
     private SetupPhase currentPhase = SetupPhase.DefiningLeftHembra;
@@ -44,7 +44,8 @@ public class BongosManager : InstrumentDefiner
         {
             Debug.Log("Bongo Manager activated in CV mode.");
             cvCircleFinder.Activate();
-        } else
+        }
+        else
         {
             base.Activate();
         }
@@ -68,7 +69,7 @@ public class BongosManager : InstrumentDefiner
     {
         isDefined = true;
         IsActive = false;
-
+        inCorrectionMode = false;
         OnBothBongosDefined.Invoke();
     }
 
@@ -120,7 +121,7 @@ public class BongosManager : InstrumentDefiner
         {
             // Normalize them to have the same y coordinate first
             float y_Value = (capturedPoints[0].y + capturedPoints[1].y + capturedPoints[2].y) / 3;
-            
+
             Vector3 circPoint1 = new Vector3(capturedPoints[0].x, y_Value, capturedPoints[0].z);
             Vector3 circPoint2 = new Vector3(capturedPoints[1].x, y_Value, capturedPoints[1].z);
             Vector3 circPoint3 = new Vector3(capturedPoints[2].x, y_Value, capturedPoints[2].z);
@@ -139,6 +140,9 @@ public class BongosManager : InstrumentDefiner
             // Notify Listeners
             Debug.Log($"{drumName} Defined! Radius: {newCircle.Radius:F3}");
 
+            OnBongoDefined?.Invoke(newCircle, currentPhase);
+
+
             // Advance State
             if (currentPhase == SetupPhase.DefiningLeftHembra)
             {
@@ -148,7 +152,6 @@ public class BongosManager : InstrumentDefiner
             {
                 CompleteSetup();
             }
-            OnBongoDefined?.Invoke(newCircle);
         }
         catch (Exception e)
         {

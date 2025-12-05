@@ -13,6 +13,12 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
     // Tracks the drums defined in BongosManager
     private DefinedCircle? leftDrum;
     private DefinedCircle? rightDrum;
+
+    [SerializeField]
+    private SpriteRenderer leftCircle;
+
+    [SerializeField]
+    private SpriteRenderer rightCircle;
     private static string[] noteNames =
                 { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" }; // used to map note names to key indices
     public event Action OnNoteFinished;
@@ -29,10 +35,20 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
         BongosManager.OnBongoDefined -= HandleBongoDefined;
     }
 
-    private void HandleBongoDefined(DefinedCircle circle)
+    private void HandleBongoDefined(DefinedCircle circle, BongosManager.SetupPhase phase)
     {
-        if (leftDrum == null) leftDrum = circle;
-        else if (rightDrum == null) rightDrum = circle;
+        if (phase == BongosManager.SetupPhase.DefiningLeftHembra)
+        {
+            leftDrum = circle;
+            leftCircle.transform.localScale = new Vector3(circle.Radius * 2f, circle.Radius * 2f, 1f);
+            leftCircle.transform.position = circle.Center;
+        }
+        else if (phase == BongosManager.SetupPhase.DefiningRightMacho)
+        {
+            rightDrum = circle;
+            rightCircle.transform.localScale = new Vector3(circle.Radius * 2f, circle.Radius * 2f, 1f);
+            rightCircle.transform.position = circle.Center;
+        }
     }
 
     // Interface Implementation
@@ -85,6 +101,27 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
     public void NotifyNoteDone()
     {
         OnNoteFinished?.Invoke();
+    }
+    public void NotifyNoteDone(bool isLeftDrum)
+    {
+        OnNoteFinished?.Invoke();
+        return;
+        if (isLeftDrum)
+            StartCoroutine(ShowCircle(leftCircle));
+        else
+            StartCoroutine(ShowCircle(rightCircle));
+
+    }
+
+
+    IEnumerator ShowCircle(SpriteRenderer circleRenderer)
+    {
+        circleRenderer.enabled = true;
+
+        // Wait for one rendered frame
+        yield return new WaitForSeconds(0.05f);
+
+        circleRenderer.enabled = false;
     }
 
     private int NoteNameToMidi(string note)

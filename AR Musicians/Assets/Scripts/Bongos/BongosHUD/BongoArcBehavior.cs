@@ -85,7 +85,8 @@ public class BongoArcBehavior : MonoBehaviour
     {
         isRunning = false;
         DrawArc(targetRadius);
-        strategy.NotifyNoteDone();
+        strategy.NotifyNoteDone(isLeftDrum);
+        unsubscribe();
         Destroy(gameObject, 0.1f);
     }
 
@@ -131,6 +132,13 @@ public class BongoArcBehavior : MonoBehaviour
         ApplyResumeOffset(adjustment);
     }
 
+    private void unsubscribe()
+    {
+        RhythmGameManager.OnPause -= OnPause;
+        RhythmGameManager.OnQuit -= OnQuit;
+        RhythmGameManager.OnResume -= OnResume;
+    }
+
     private void ApplyResumeOffset(float extraDelay)
     {
         float durationPaused = Time.time - timeWhenPaused;
@@ -142,6 +150,8 @@ public class BongoArcBehavior : MonoBehaviour
 
     public void OnQuit()
     {
+        unsubscribe();
+        strategy.NotifyNoteDone();
         Destroy(gameObject);
     }
 }

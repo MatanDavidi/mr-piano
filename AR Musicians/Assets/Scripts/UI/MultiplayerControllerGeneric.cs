@@ -235,7 +235,7 @@ public class MultiplayerControllerGeneric : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinLobby();
         ProjectConfig.Settings.enableMultiplayer = true;
         if (menuController.multiplayerButton != null)
-            menuController.multiplayerButton.interactable = ProjectConfig.Settings.enableMultiplayer;
+            menuController.multiplayerButton.interactable = ProjectConfig.Settings.enableMultiplayer && menuController.instrumentDefined;
     }
 
     public void CreateRoom()
