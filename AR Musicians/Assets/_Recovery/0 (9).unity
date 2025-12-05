@@ -12150,6 +12150,7 @@ MonoBehaviour:
   noteSpherePrefab: {fileID: 2206425703323679310, guid: 7a44892b15d7b3245b896ee15261ea0a, type: 3}
   approachTime: 1.5
   spawnDistance: 0.8
+  average_key: 0
 --- !u!114 &721301430
 MonoBehaviour:
   m_ObjectHideFlags: 0

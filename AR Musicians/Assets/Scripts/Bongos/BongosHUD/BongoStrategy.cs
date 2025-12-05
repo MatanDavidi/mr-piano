@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class BongoStrategy : MonoBehaviour, IGameplayStrategy
@@ -12,8 +13,11 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
     // Tracks the drums defined in BongosManager
     private DefinedCircle? leftDrum;
     private DefinedCircle? rightDrum;
-
+    private static string[] noteNames =
+                { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" }; // used to map note names to key indices
     public event Action OnNoteFinished;
+
+    public int average_key = 0;
 
     private void Start()
     {
@@ -43,13 +47,12 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
     {
         // Map Keys to Drums (Simple split)
         // You can make this smarter (e.g., specific track names in MIDI)
-        int midi = NoteNameToMidi(note.key);
-        note.keyIndex = midi < 60 ? 0 : 1; // 0 = Left, 1 = Right
+        note.keyIndex = NoteNameToMidi(note.key); // 0 = Left, 1 = Right
     }
 
     public void SpawnNote(NoteEvent note, float gameSpeed)
     {
-        bool isLeft = note.keyIndex == 0;
+        bool isLeft = note.keyIndex < average_key;
         DefinedCircle targetDrum = isLeft ? leftDrum.Value : rightDrum.Value;
 
         GameObject sphere = Instantiate(noteSpherePrefab);
@@ -76,6 +79,8 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
         RhythmGameManager.OnQuit += behavior.OnQuit;
     }
 
+
+
     public void NotifyNoteDone()
     {
         OnNoteFinished?.Invoke();
@@ -83,7 +88,12 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
 
     private int NoteNameToMidi(string note)
     {
-        // Simple helper or reuse existing logic
-        return 60; // Default
+        string namePart = note.Substring(0, note.Length - 1); // everything but the last character is part of the name
+        int octave = int.Parse(note.Substring(note.Length - 1)); // gives the octave
+
+        int noteNumber = System.Array.IndexOf(noteNames, namePart);
+
+        int keyIndex = noteNumber + 12 * octave;
+        return keyIndex;
     }
 }

@@ -140,6 +140,17 @@ public class RhythmGameManager : MonoBehaviour
                 if (currentStrategy != null)
                     currentStrategy.PreprocessNote(n);
             }
+            if (currentStrategy is BongoStrategy)
+            {
+                int average_key = 0;
+                foreach (var n in notes)
+                {
+                    average_key += n.keyIndex;
+                }
+                average_key /= notes.Count;
+                BongoStrategy strat = (BongoStrategy)currentStrategy;
+                strat.average_key = average_key;
+            }
         }
     }
 
