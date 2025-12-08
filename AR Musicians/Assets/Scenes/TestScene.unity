@@ -7997,7 +7997,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5413e4b22e2adc74c8cca98860b32eff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModelManager
-  modelAsset: {fileID: 5022602860645237092, guid: 03600bb9395098447aa3a292fb9be0fc, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 14b7e4cc81efb3c4894da32fd0a4b62f, type: 3}
   GPU: 0
   OnnxModel: {fileID: 0}
 --- !u!4 &527283334
@@ -12829,7 +12829,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5413e4b22e2adc74c8cca98860b32eff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModelManager
-  modelAsset: {fileID: 5022602860645237092, guid: 7cc6c77c94e88b444aeadba4245d7cbd, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 50bc0c5e5e5b20e4eb66ce83d4553dc1, type: 3}
   GPU: 1
   OnnxModel: {fileID: 0}
 --- !u!4 &725473863
@@ -19173,8 +19173,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlaneController
   width: 10
   height: 1
-  totalKeys: 88
-  leftmostKey: A0
+  totalKeys: 32
+  leftmostKey: F4
   whiteToBlackRatio: 1.66
 --- !u!1 &1111381226
 GameObject:
@@ -37705,6 +37705,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2102984054}
     m_Modifications:
+    - target: {fileID: 2139185334, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 435407831072319256, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
       propertyPath: _leftEyeAnchor
       value: 
@@ -37781,10 +37785,26 @@ PrefabInstance:
       propertyPath: _playerOrigin
       value: 
       objectReference: {fileID: 2102984054}
+    - target: {fileID: 6147449420076126351, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6267690530596161800, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
       propertyPath: _ovrCameraRig
       value: 
       objectReference: {fileID: 2102984052}
+    - target: {fileID: 6267690530596161800, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+      propertyPath: _requireOvrHands
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8702425413754196323, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9170937211371257168, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

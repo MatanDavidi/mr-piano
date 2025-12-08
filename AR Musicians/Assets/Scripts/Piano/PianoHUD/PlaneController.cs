@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using UnityEngine.InputSystem;
-using Melanchall.DryWetMidi.Interaction;
 
 [ExecuteAlways]
 public class PlaneController : MonoBehaviour
@@ -12,109 +10,153 @@ public class PlaneController : MonoBehaviour
     public float height = 1f;
 
     [Header("Piano Setup")]
-    public int totalKeys = 88;
-    public string leftmostKey = "A0";
+    public int totalKeys = 32;       // Set to 32 for your hardware
+    public string leftmostKey = "F3"; // Set to "F3"
 
-    private int leftmostKeyIndex = 0;
+    // Internal variable to store the parsed integer of the leftmost key
+    private int leftmostKeyIndex = -1;
+
     public float whiteToBlackRatio = 1.66f;
-    private List<Vector3> localKeyCenters = new List<Vector3>(); // Positions in *Local* Space!
-    private List<float> keyWidths = new List<float>();
+
+    // Using a Dictionary is safer for sparse lookups, but we keep your variable names 
+    // to minimize friction. 
+    private Dictionary<int, Vector3> localKeyCenters = new Dictionary<int, Vector3>();
+    private Dictionary<int, float> keyWidths = new Dictionary<int, float>();
+
     private static string[] noteNames =
-            { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" }; // used to map note names to key indices
+            { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+
+    // FIXED PATTERN: Starts at C, goes to B. (True = White, False = Black)
+    // C, C#, D, D#, E, F, F#, G, G#, A, A#, B
+    private static bool[] chromaticPattern =
+            { true, false, true, false, true, true, false, true, false, true, false, true };
 
     void Start()
     {
+        reInit();
+    }
+
+    // Keep this public as requested
+    public void reInit()
+    {
+        // 1. Calculate the MIDI number for the start key (e.g., F3 -> 53)
         leftmostKeyIndex = NoteNameToKeyIndex(leftmostKey);
         BuildKeyLayout();
     }
 
-    public void reInit()
+    // Added OnValidate so you see changes in Editor without hitting Play
+    void OnValidate()
     {
-        Start();
+        reInit();
     }
 
     void Update()
     {
-        transform.localScale = new Vector3(width, height, 1f);
+        if (transform.localScale.x != width || transform.localScale.y != height)
+            transform.localScale = new Vector3(width, height, 1f);
     }
 
-    // Determine which keys are white or black and space them correctly
     void BuildKeyLayout()
     {
         localKeyCenters.Clear();
         keyWidths.Clear();
 
-        // Setup unit width for both types of keys
         float whiteWidthUnit = 1f;
         float blackWidthUnit = whiteWidthUnit / whiteToBlackRatio;
 
-        // Pattern: true = white, false = black
-        bool[] pattern = {
-            true,false,true,false,true,true,false,true,false,true,false,true
-        };
-
-        // Count total width units first
+        // 1. Count total width units required for the specific 32 keys
         float totalUnits = 0f;
         for (int i = 0; i < totalKeys; i++)
         {
-            bool isWhite = pattern[(leftmostKeyIndex + i) % 12]; // wrap around as it repeats every 12 keys
+            int currentMidiNote = leftmostKeyIndex + i;
+            bool isWhite = IsWhiteKey(currentMidiNote);
             totalUnits += isWhite ? whiteWidthUnit : blackWidthUnit;
         }
 
-        float unitToLocal = 1f / totalUnits;
+        if (totalUnits <= 0) return; // Prevent division by zero
 
-        // Compute keycenter positions with the corresponding width
+        float unitToLocal = 1f / totalUnits;
         float currentX = -0.5f;
-        Debug.Log($"Getting world width for all keys");
+
+        // 2. Compute positions
         for (int i = 0; i < totalKeys; i++)
         {
-            Debug.Log($"Getting world width for ${i + 1}th key");
-            bool isWhite = pattern[(leftmostKeyIndex + i) % 12];
-            float wUnits = isWhite ? whiteWidthUnit : blackWidthUnit;
-            float worldWidth = wUnits * unitToLocal; // width of the key in local space
+            int currentMidiNote = leftmostKeyIndex + i;
 
-            float centerX = currentX + worldWidth / 2f;
-            localKeyCenters.Add(new Vector3(centerX, 0.5f, 0f)); // spawn at the top of the plane (total height is 1 in local space, since center is (0,0), 0.5 is at the top)
-            Debug.Log($"Adding world width {worldWidth} to keyWidths");
-            keyWidths.Add(worldWidth);
-            Debug.Log($"Added world width {worldWidth} to keyWidths");
+            bool isWhite = IsWhiteKey(currentMidiNote);
+            float wUnits = isWhite ? whiteWidthUnit : blackWidthUnit;
+            float worldWidth = wUnits * unitToLocal;
+
+            float centerX = currentX + (worldWidth / 2f);
+
+            // Store results keyed by the MIDI Note Number
+            if (!localKeyCenters.ContainsKey(currentMidiNote))
+            {
+                localKeyCenters.Add(currentMidiNote, new Vector3(centerX, 0.5f, 0f));
+                keyWidths.Add(currentMidiNote, worldWidth);
+            }
 
             currentX += worldWidth;
         }
     }
 
+    // --- Public API (Signatures Unchanged) ---
 
     public float GetLocalKeyWidth(int keyIndex)
     {
-        return keyWidths[keyIndex - leftmostKeyIndex];
+        // Check dictionary first to prevent index out of bounds errors
+        if (keyWidths.ContainsKey(keyIndex))
+            return keyWidths[keyIndex];
+
+        return 0f;
     }
 
-    // Return the local position of the key
     public Vector3 GetLocalKeyPosition(int keyIndex)
     {
-        if (localKeyCenters.Count == 0) BuildKeyLayout();
+        // If the dictionary is empty (e.g., script just loaded), rebuild it
+        if (localKeyCenters.Count == 0) reInit();
 
-        keyIndex = Mathf.Clamp(keyIndex, leftmostKeyIndex, totalKeys + leftmostKeyIndex - 1); //TODO: What happens if we have a piano that doesn't have a certain key?
-        Vector3 localPos = localKeyCenters[keyIndex - leftmostKeyIndex];
-        return localPos;
+        // Check dictionary for the exact MIDI note (e.g., 53)
+        if (localKeyCenters.ContainsKey(keyIndex))
+        {
+            return localKeyCenters[keyIndex];
+        }
+
+        // Return 0 if the note is not part of the keyboard (e.g. note 0 when keyboard starts at 53)
+        return Vector3.zero;
     }
+
     public bool IsWhiteKey(int keyIndex)
     {
-        bool[] pattern = { true, false, true, false, true, true, false, true, false, true, false, true };
-        return pattern[(keyIndex - leftmostKeyIndex) % 12];
+        // FIX: Remove the +9 offset. 
+        // Standard MIDI maps 0 to C-1. 
+        // Therefore keyIndex % 12 aligns perfectly with C-major starting at 0.
+        return chromaticPattern[keyIndex % 12];
     }
 
     public int NoteNameToKeyIndex(string note)
     {
-        string namePart = note.Substring(0, note.Length - 1); // everything but the last character is part of the name
-        int octave = int.Parse(note.Substring(note.Length - 1)); // gives the octave
+        if (string.IsNullOrEmpty(note)) return 0;
 
-        int noteNumber = System.Array.IndexOf(noteNames, namePart);
+        try
+        {
+            string namePart = note.Substring(0, note.Length - 1);
+            int octave = int.Parse(note.Substring(note.Length - 1));
+            int noteNumber = System.Array.IndexOf(noteNames, namePart);
 
-        // Piano key index = noteNumber + 12 * octave number
-        int keyIndex = noteNumber + 12 * octave;
-        if (leftmostKeyIndex != -1)
-            keyIndex = Math.Clamp(keyIndex, leftmostKeyIndex, leftmostKeyIndex + totalKeys - 1);
-        return keyIndex;
+            // FIX: Standard MIDI logic.
+            // C-1 is 0. C0 is 12. C4 is 60.
+            // Formula: (Octave + 1) * 12 + NoteIndex
+            // Note: If your MIDI files assume C0 = 0, remove the "+ 1". 
+            // Standard DryWetMidi usage assumes C-1 = 0.
+            int keyIndex = noteNumber + 12 * (octave + 1);
+
+            return keyIndex;
+        }
+        catch
+        {
+            Debug.LogError($"Error parsing note name: {note}. Defaulting to 0.");
+            return 0;
+        }
     }
 }

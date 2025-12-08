@@ -21,6 +21,7 @@ namespace Assets.Scripts
             using (var writer = new StreamWriter(tempfile))
             {
                 writer.WriteLine(header);
+
                 if (File.Exists(filename))
                 {
                     using var reader = new StreamReader(filename);
