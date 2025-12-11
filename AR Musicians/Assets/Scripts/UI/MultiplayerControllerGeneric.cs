@@ -218,11 +218,6 @@ public class MultiplayerControllerGeneric : MonoBehaviourPunCallbacks
 
     #region Connection
 
-    public override void OnRoomListUpdate(List<RoomInfo> roomList)
-    {
-        cachedRoomNames.Clear();
-        cachedRoomNames.AddRange(roomList.Select(r => r.Name));
-    }
 
     public bool RoomExists(string name)
     {
@@ -241,70 +236,164 @@ public class MultiplayerControllerGeneric : MonoBehaviourPunCallbacks
     public void CreateRoom()
     {
         string roomName = createRoomText.text;
-        if (RoomExists(roomName))
+
+        // Optional: clear whitespace
+        if (string.IsNullOrEmpty(roomName)) roomName = "Room1";
+
+        // Check local cache, but don't rely on it 100% as it might be outdated
+
+        // Create the room. 
+        // Note: We keep TTL (Time To Live) at 0 so the room dies instantly when the last player leaves.
+        RoomOptions options = new RoomOptions { MaxPlayers = 4, EmptyRoomTtl = 0, PlayerTtl = 0 };
+        PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
+    }
+
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        // Update the cache logic to handle removals properly
+        foreach (RoomInfo info in roomList)
         {
-            Debug.LogError("Room " + roomName + " already exists!");
-            return;
+            // If RemovedFromList is true, the room is gone or full/closed
+            if (info.RemovedFromList)
+            {
+                if (cachedRoomNames.Contains(info.Name))
+                {
+                    cachedRoomNames.Remove(info.Name);
+                }
+            }
+            else
+            {
+                // Add if not present
+                if (!cachedRoomNames.Contains(info.Name))
+                {
+                    cachedRoomNames.Add(info.Name);
+                }
+            }
         }
-        PhotonNetwork.CreateRoom(roomName, new RoomOptions { MaxPlayers = 4 }, TypedLobby.Default);
-        master = true;
-        ProjectConfig.Settings.master = true;
-        playersReady = new Dictionary<Player, bool>();
-        menuController.ShowSongMenu();
     }
 
     public void JoinRoom()
     {
         string roomName = joinRoomText.text;
+
+        if (string.IsNullOrEmpty(roomName)) roomName = "Room1";
+
         if (!RoomExists(roomName))
         {
-            Debug.LogError("Room " + roomName + " does not exist!");
+            Debug.LogError("Room " + roomName + " does not exist in cache!");
             return;
         }
+
         PhotonNetwork.JoinRoom(roomName);
-        master = false;
-        ProjectConfig.Settings.master = false;
-        menuController.ShowSongMenu();
-    }
-
-    [PunRPC]
-    public void OnKick()
-    {
-        if (!master)
-            PhotonNetwork.LeaveRoom();
-        Debug.LogError("You were kicked.");
-    }
-
-    public void LeaveRoom()
-    {
-        if (!PhotonNetwork.InRoom) return;
-
-        if (!master)
-        {
-            PhotonNetwork.LeaveRoom();
-            return;
-        }
-
-        // Master leaves -> Kick everyone else or Migrate Master (here we kick)
-        foreach (var player in PhotonNetwork.PlayerListOthers)
-        {
-            photonView.RPC("OnKick", player);
-        }
-        playersReady = new Dictionary<Player, bool>();
-        PhotonNetwork.LeaveRoom();
     }
 
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
-        // New Client joins -> Ask Master for current song
-        photonView.RPC("OnGiveQueuePosNetwork", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
-        if (master)
+        Debug.Log("OnJoinedRoom: Successfully connected to room.");
+
+        // Initialize the dictionary immediately to avoid NullReference later
+        playersReady = new Dictionary<Player, bool>();
+
+        // Check if we are the Master Client (Creator)
+        if (PhotonNetwork.IsMasterClient)
         {
-            if (playersReady == null) playersReady = new Dictionary<Player, bool>();
+            master = true;
+            ProjectConfig.Settings.master = true;
+
+            // Set local player state
             playersReady[PhotonNetwork.LocalPlayer] = false;
+
+            // Show the song selection menu for the Host
+            menuController.ShowSongMenu();
+        }
+        else
+        {
+            master = false;
+            ProjectConfig.Settings.master = false;
+
+            // Ask Master for the current song / queue position
+            photonView.RPC("OnGiveQueuePosNetwork", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
+
+            // Show the menu (or a "Waiting for Host" screen if you have one)
+            menuController.ShowSongMenu();
         }
     }
+
+    //[PunRPC]
+    //public void OnKick()
+    //{
+    //    if (!master)
+    //        PhotonNetwork.LeaveRoom(false);
+    //    Debug.LogError("You were kicked.");
+    //}
+
+    public void LeaveRoom()
+    {
+        if (!PhotonNetwork.InRoom) return;
+
+        // FIX: If we are the host, we must 'destroy' the room logically before leaving.
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 1. Make the room invisible and closed.
+            // This immediately removes it from the Lobby list for others.
+            PhotonNetwork.CurrentRoom.IsVisible = false;
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+
+            // 2. Kick everyone else to ensure they don't get stuck in a master-less room.
+            photonView.RPC("OnKick", RpcTarget.Others);
+        }
+
+        // 3. Leave the room locally
+        PhotonNetwork.LeaveRoom(false);
+    }
+
+    // Called when the local player leaves the room (voluntarily or after being kicked)
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+
+        // Cleanup local state
+        playersReady = new Dictionary<Player, bool>();
+
+
+        // Reset UI
+        menuController.preSongChoiceMenu();
+
+        master = true; // Default back to true for singleplayer logic
+        ProjectConfig.Settings.master = true;
+    }
+
+    [PunRPC]
+    public void OnKick()
+    {
+        // Receive the kick command and leave gracefully
+        PhotonNetwork.LeaveRoom(false);
+        Debug.Log("The Host ended the session.");
+
+        // Optional: Show a UI message like "Host disbanded the room"
+    }
+
+    // FAILSAFE: If the Master crashes (Alt+F4) and didn't call LeaveRoom(),
+    // Photon will promote a new player to Master. We must catch this.
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        // If we are still in the room and the original host is gone,
+        // we (the new master or clients) should just leave to prevent a zombie state.
+        LeaveRoom();
+    }
+
+    //public override void OnJoinedRoom()
+    //{
+    //    base.OnJoinedRoom();
+    //    // New Client joins -> Ask Master for current song
+    //    photonView.RPC("OnGiveQueuePosNetwork", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
+    //    if (master)
+    //    {
+    //        if (playersReady == null) playersReady = new Dictionary<Player, bool>();
+    //        playersReady[PhotonNetwork.LocalPlayer] = false;
+    //    }
+    //}
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
@@ -324,13 +413,13 @@ public class MultiplayerControllerGeneric : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnLeftRoom()
-    {
-        base.OnLeftRoom();
-        menuController.preSongChoiceMenu();
-        master = true;
-        ProjectConfig.Settings.master = true;
-    }
+    //public override void OnLeftRoom()
+    //{
+    //    base.OnLeftRoom();
+    //    menuController.preSongChoiceMenu();
+    //    master = true;
+    //    ProjectConfig.Settings.master = true;
+    //}
 
     public override void OnDisconnected(DisconnectCause cause)
     {
