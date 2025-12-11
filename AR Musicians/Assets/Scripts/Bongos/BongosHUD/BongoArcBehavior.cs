@@ -141,9 +141,8 @@ public class BongoArcBehavior : MonoBehaviour
 
     private void ApplyResumeOffset(float extraDelay)
     {
-        float durationPaused = Time.time - timeWhenPaused;
 
-        startTime += durationPaused + extraDelay;
+        startTime += extraDelay;
 
         isRunning = true;
     }
