@@ -38,6 +38,12 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
 
     public void SpawnNote(NoteEvent note, float gameSpeed)
     {
+        float keyWidth = plane.GetLocalKeyWidth(note.keyIndex);
+        if (keyWidth == 0.0f)
+        {
+            OnNoteFinished?.Invoke();
+            return;
+        }
         // --- Exact Logic from original SpawnCube ---
         float velocity = plane.height / fallTime;
         float blockHeight = velocity * note.duration;
@@ -52,7 +58,6 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         cube.transform.rotation = plane.transform.rotation;
 
         // Scale logic
-        float keyWidth = plane.GetLocalKeyWidth(note.keyIndex);
         cube.transform.localScale = new Vector3(keyWidth * plane.width, blockHeight, blockDepth);
 
         // Color logic
