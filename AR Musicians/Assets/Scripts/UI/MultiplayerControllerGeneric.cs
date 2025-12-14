@@ -281,7 +281,6 @@ public class MultiplayerControllerGeneric : MonoBehaviourPunCallbacks
         if (!RoomExists(roomName))
         {
             Debug.LogError("Room " + roomName + " does not exist in cache!");
-            return;
         }
 
         PhotonNetwork.JoinRoom(roomName);
