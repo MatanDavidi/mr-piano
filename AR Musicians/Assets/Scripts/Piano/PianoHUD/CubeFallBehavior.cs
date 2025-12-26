@@ -19,7 +19,8 @@ public class CubeFallBehavior : MonoBehaviour
     private bool done = false;
     private bool paused = false;
 
-    public void Configure(PianoStrategy strat, PlaneController p, NoteEvent note, float fall, float height, float depth, int keyIndex)
+    private Renderer rend;
+    public void Configure(PianoStrategy strat, PlaneController p, NoteEvent note, float fall, float height, float depth, int keyIndex, Renderer rend)
     {
         this.strategy = strat;
         this.plane = p;
@@ -29,6 +30,7 @@ public class CubeFallBehavior : MonoBehaviour
         this.origBlockHeight = height;
         this.blockDepth = depth;
         this.keyIndex = keyIndex;
+        this.rend = rend;
     }
 
     void Start()
@@ -89,6 +91,11 @@ public class CubeFallBehavior : MonoBehaviour
 
     void Stretch()
     {
+        if (rend.material.color == Color.white)
+            rend.material.color = Color.cyan;
+        else if (rend.material.color == Color.black)
+            rend.material.color = Color.darkCyan;
+
         float timeSinceSpawn = Time.time - spawnTime - pauseTime;
         float timeSinceBottom = timeSinceSpawn - fallTime;
         float t = Mathf.Clamp01(timeSinceBottom / duration);
