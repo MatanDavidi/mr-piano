@@ -10,3 +10,7 @@
 5. Enable USB Debugging (If not prompted, see: https://developers.meta.com/horizon/documentation/unity/unity-development-overview/)
 6. Go to Project Settings -> Build Device and choose your Meta Quest
 7. You can now build the app using CTRL + B
+
+# Configuring your own Piano:
+1. MainScene -> Logic -> Detection -> PlaneController
+2. Adjust `Total Keys` and `Leftmost Key` to your piano. (Optionally also `White To Black Ratio`)
