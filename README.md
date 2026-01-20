@@ -4,7 +4,7 @@
 
 # Installation
 1. Clone repository: git clone https://github.com/MatanDavidi/mr-piano.git
-2. Open project in Unity Version XXXX
+2. Open project in Unity Version 6000.2.8f1
 3. Download Model files from TODO and put them in the scene tree: path/to/sentis managers: field
 4. Connect your Quest 3 USB
 5. Enable USB Debugging (If not prompted, see: https://developers.meta.com/horizon/documentation/unity/unity-development-overview/)
