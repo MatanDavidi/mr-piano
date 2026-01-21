@@ -74,11 +74,11 @@ This project was done as part of the [Mixed Reality](https://cvg.ethz.ch/lecture
    </div>
 5. Connect your Quest 3 via USB
 6. Enable USB Debugging (If not prompted, see: https://developers.meta.com/horizon/documentation/unity/unity-development-overview/)
-7. Go to `Project Settings > Run Device` and choose your Meta Quest
+7. Go to `File > Build Profiles` and choose your Meta Quest
    <div align="center" style="padding: 10px 0 10px 0">
    <img src="assets/devicesetup.png" alt="Run Device Selection" width="50%"/>
    </div>
-8. You can now build the app using `Ctrl + B`
+8. You can now build the app using `Ctrl + B`, or by clicking directly on `Build and Run` (you might need to first select the `Meta Quest` platform and hit `Switch Platform`).
 
 ## Configuring your own Piano
 Depending on your piano model, you might need to adjust the piano parameters in the `PlaneController`.
