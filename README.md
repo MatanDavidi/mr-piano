@@ -21,6 +21,8 @@ Ata Celen
 &nbsp;&nbsp;&nbsp;&nbsp;
 
 ETH Zürich, Switzerland
+&nbsp;&nbsp;&nbsp;&nbsp;
+\*Equal contribution
 </div>
 
 Below are instructions to setup and run the [Unity App](#unity-app), as well as the [Synthetic Dataset + Perception Pipelines](#synthetic-dataset--perception-pipelines).
