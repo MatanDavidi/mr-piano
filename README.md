@@ -4,8 +4,9 @@
 
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-SynthesiaSet-yellow)](https://huggingface.co/datasets/gserifi/SynthesiaSet)&#160;
 [![Polybox Checkpoints](https://img.shields.io/badge/Polybox_Checkpoints-0063A6.svg?logo=icloud)](https://polybox.ethz.ch/index.php/s/RXfAobWzkpjRgzG)&#160;
-[![Technical Report](https://img.shields.io/badge/%F0%9F%93%84%20Technical_Report-b5212f)](assets/report.pdf)&#160;
-[![Poster](https://img.shields.io/badge/%F0%9F%96%BC%20Poster-008080)](assets/poster.pdf)
+[![Technical Report](https://img.shields.io/badge/%F0%9F%93%84%20Technical_Report-rebeccapurple)](assets/report.pdf)&#160;
+[![Poster](https://img.shields.io/badge/%F0%9F%96%BC%20Poster-teal)](assets/poster.pdf)&#160;
+[![Demo Video](https://img.shields.io/badge/%F0%9F%8E%AC%20Demo_Video-crimson)](https://youtu.be/5JOPkejo6eE)
 </div>
 
 <div align="center">
@@ -17,7 +18,7 @@ Gent Serifi*
 &nbsp;&nbsp;&nbsp;&nbsp;
 Nicola Studer*
 &nbsp;&nbsp;&nbsp;&nbsp;
-Ata Celen
+Ata Çelen
 &nbsp;&nbsp;&nbsp;&nbsp;
 
 ETH Zürich, Switzerland
